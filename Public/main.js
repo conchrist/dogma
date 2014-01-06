@@ -1,4 +1,5 @@
 (function () {
+  var username = 'USERNAME';
   var textField = document.getElementById('textField');
   var sendButton = document.getElementById('sendButton');
   var pingButton = document.getElementById('pingButton');
@@ -7,20 +8,15 @@
   var messages = [];
 
   Object.observe(messages, function(changes) {
-    //changes.forEach(whatHappened);
     renderMessages();
   });
-
-  function whatHappened(change) {
-    console.log(change.name + " was " + change.type + " and is now " + change.object[change.name]);
-  }
 
   function renderMessages() {
     var messageElem = document.getElementById('messages');
     messageElem.innerHTML = '';
     messages.forEach(function (message) {
       var li = document.createElement('li');
-      var textNode = document.createTextNode(message.user+': '+message.text);
+      var textNode = document.createTextNode(message.from+': '+message.message);
       li.appendChild(textNode);
       messageElem.appendChild(li);
     })
@@ -56,11 +52,12 @@
 
   socket.onmessage = function (evt) {
     var data = evt.data;
-    console.log("Message received", data)
-    messages.push({
-      user: 'you',
-      text: data
-    });
+    var object = JSON.parse(data);
+    //Don't add your own messages to the list.
+    if(object.from !== username) {
+      messages.push(object);
+    }
+    console.log("Message received", object);
   };
 
   socket.onerror = function (e) {
@@ -71,15 +68,17 @@
     var text = textField.value;
     console.log('Sending', text);
     sendMessage(text,socket);
-    messages.push({
-      user: 'me',
-      text: text
-    });
     textField.value = '';
   }
 
   function sendMessage(message, socket) {
-    socket.send(message);
+    var object = {
+      message: message,
+      time: Date.now(),
+      from: username
+    };
+    messages.push(object);
+    socket.send(JSON.stringify(object));
   }
 
   
