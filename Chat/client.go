@@ -1,3 +1,4 @@
+
 package Chat
 
 import (
@@ -44,6 +45,11 @@ func (c *Client) Write() chan<- *MessageStruct {
 	return (chan<- *MessageStruct)(c.ch)
 }
 
+func (c *Client) Listen() {
+	go c.writeToAll()
+	c.ListenToAll()
+}
+
 //return done channel.
 func (c *Client) Done() chan<- bool {
 	return (chan<- bool)(c.done)
@@ -54,8 +60,36 @@ func (c *Client) writeToAll() {
 
 	for {
 		select {
-		case message := <-c.ch:
+		case m := <-c.ch:
+			log.Println("Sending... ", m)
+			websocket.JSON.Send(c.ws, m)
 
+		case <-c.done:
+			c.server.RemoveClient() <- c
+			c.done <- true
+			return
+		}
+	}
+}
+
+func (c *Client) ListenToAll() {
+	log.Println("Listening to all clients")
+	for {
+		select {
+		case <-c.done:
+			log.Println("Remove yourself!")
+			c.server.RemoveClient() <- c
+			c.done <- true
+			return
+		default:
+			var message MessageStruct
+			err := websocket.JSON.Receive(c.ws, &message)
+			if err != nil {
+				//something is wrong, close yourself
+				c.done <- true
+			} else {
+				c.server.BroadCast() <- &message
+			}
 		}
 	}
 }
