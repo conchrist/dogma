@@ -44,7 +44,7 @@ func (s *Server) BroadCast() chan<- *MessageStruct {
 }
 
 //holds all the messages from clients.
-//why this???
+//why this??? copy all the messages to new client.
 func (s *Server) Messages() []*MessageStruct {
 	msgs := make([]*MessageStruct, len(s.messages))
 	copy(msgs, s.messages)
