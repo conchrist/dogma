@@ -2,14 +2,15 @@ package main
 
 import (
 	"flag"
-	"github.com/christopherL91/GoWebSocket2/Chat"
+	"./server"
 	"html/template"
 	"net/http"
 	"runtime"
 )
 
+
 func serveMain(rw http.ResponseWriter, req *http.Request) {
-	var template_file, _ = template.ParseFiles("Public/web.html")
+	var template_file, _ = template.ParseFiles("client/src/views/index.html")
 	req.Header.Add("Content-Type", "application/javascript")
 	template_file.Execute(rw, nil)
 }
@@ -24,8 +25,9 @@ func main() {
 	server := Chat.NewServer("/echo")
 	go server.Listen()
 	http.HandleFunc("/", serveMain)
-	http.HandleFunc("/Public/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, r.URL.Path[1:])
+	http.HandleFunc("/public/", func(w http.ResponseWriter, r *http.Request) {
+		path := "client/" + r.URL.Path
+		http.ServeFile(w, r, path)
 	})
 	err := http.ListenAndServe(":4000", nil)
 	if err != nil {
