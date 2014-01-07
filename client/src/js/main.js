@@ -1,9 +1,29 @@
-(function () {
+(function (window) {
+  "use strict";
+
   var username = 'USERNAME';
   var textField = document.getElementById('textField');
   var sendButton = document.getElementById('sendButton');
   var pingButton = document.getElementById('pingButton');
-  var socket = connect('localhost', 4000,'/echo');
+  var socket;
+
+  function run () {
+    socket = connect('localhost', 4000,'/echo');
+
+    socket.onmessage = function (evt) {
+      var data = evt.data;
+      var object = JSON.parse(data);
+      //Don't add your own messages to the list.
+      if(object.from !== username) {
+        messages.push(object);
+      }
+      console.log("Message received", object);
+    };
+
+    socket.onerror = function (e) {
+      console.err(e);
+    };
+  }
 
   var messages = [];
 
@@ -19,7 +39,7 @@
       var textNode = document.createTextNode(message.from+': '+message.message);
       li.appendChild(textNode);
       messageElem.appendChild(li);
-    })
+    });
   }
 
 
@@ -50,20 +70,6 @@
     return ws; 
   }
 
-  socket.onmessage = function (evt) {
-    var data = evt.data;
-    var object = JSON.parse(data);
-    //Don't add your own messages to the list.
-    if(object.from !== username) {
-      messages.push(object);
-    }
-    console.log("Message received", object);
-  };
-
-  socket.onerror = function (e) {
-    console.err(e);
-  }
-
   function handleText() {
     var text = textField.value;
     console.log('Sending', text);
@@ -81,5 +87,8 @@
     socket.send(JSON.stringify(object));
   }
 
-  
-})();
+  window.main = {
+    run: run
+  };
+
+})(this);
