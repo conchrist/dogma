@@ -1,5 +1,4 @@
-
-package Chat
+package SocketServer
 
 import (
 	"encoding/json"

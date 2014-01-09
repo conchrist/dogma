@@ -14,7 +14,7 @@
       var data = evt.data;
       var object = JSON.parse(data);
       //Don't add your own messages to the list.
-      if(object.from !== username) {
+      if(true || object.from !== username) {
         messages.push(object);
       }
       console.log("Message received", object);
@@ -83,7 +83,7 @@
       time: Date.now(),
       from: username
     };
-    messages.push(object);
+    //messages.push(object);
     socket.send(JSON.stringify(object));
   }
 

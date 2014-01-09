@@ -2,12 +2,11 @@ package main
 
 import (
 	"flag"
-	"./server"
+	"github.com/christopherL91/GoWebSocket/SocketServer"
 	"html/template"
 	"net/http"
 	"runtime"
 )
-
 
 func serveMain(rw http.ResponseWriter, req *http.Request) {
 	var template_file, _ = template.ParseFiles("client/src/views/index.html")
@@ -22,7 +21,7 @@ func init() {
 }
 
 func main() {
-	server := Chat.NewServer("/echo")
+	server := SocketServer.NewServer("/echo")
 	go server.Listen()
 	http.HandleFunc("/", serveMain)
 	http.HandleFunc("/public/", func(w http.ResponseWriter, r *http.Request) {

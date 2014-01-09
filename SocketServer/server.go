@@ -1,4 +1,4 @@
-package Chat
+package SocketServer
 
 import (
 	"code.google.com/p/go.net/websocket"
@@ -9,7 +9,7 @@ import (
 
 type Server struct {
 	pathToServer string
-	clients      []*Client
+	clients      map[*Client]bool
 	addClient    chan *Client
 	removeClient chan *Client
 	sendAll      chan *MessageStruct
@@ -19,7 +19,7 @@ type Server struct {
 func NewServer(path string) *Server {
 	tmp := Server{
 		pathToServer: path,
-		clients:      make([]*Client, 0),
+		clients:      make(map[*Client]bool),
 		addClient:    make(chan *Client),
 		removeClient: make(chan *Client),
 		sendAll:      make(chan *MessageStruct),
@@ -66,15 +66,15 @@ func (s *Server) Listen() {
 	http.Handle(s.pathToServer, websocket.Handler(onConnect))
 
 	//listen for messages, clients and so on...
-
 	for {
 		select {
 
 		//new client connecting
 		case newclient := <-s.addClient:
 			fmt.Println("New client added")
-			s.clients = append(s.clients, newclient)
-			//write all the messages to client
+			s.clients[newclient] = true
+
+			//write all previous messages to client
 			for _, msg := range s.messages {
 				newclient.Write() <- msg
 			}
@@ -83,20 +83,20 @@ func (s *Server) Listen() {
 		//client disconnected.
 		case removeClient := <-s.removeClient:
 			fmt.Println("Remove client")
-			for i := range s.clients { //i is index for the client to remove
-				if s.clients[i] == removeClient {
-					//remove client from slice.
-					s.clients = append(s.clients[:i], s.clients[i+1:]...)
-					break //come out of range loop.
-				}
-			} //end of for
+			delete(s.clients, removeClient)
 
 		case sendall := <-s.sendAll:
+			message := sendall
 			fmt.Println("Broadcast all the messages")
-			s.messages = append(s.messages, sendall)
-			for _, c := range s.clients {
-				c.Write() <- sendall
+			s.messages = append(s.messages, message)
+			for client, _ := range s.clients {
+				client.Write() <- message
 			}
+
+		default:
+			//TODO: Remove for production.
+			//fmt.Println("Connected clients: " + strconv.Itoa(len(s.clients)))
+
 		}
 	}
-} //end of listen()
+}

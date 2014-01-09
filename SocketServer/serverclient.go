@@ -1,4 +1,4 @@
-package Chat
+package SocketServer
 
 import (
 	"code.google.com/p/go.net/websocket"
@@ -12,7 +12,7 @@ const channelSize = 1000
 type Client struct {
 	ws     *websocket.Conn
 	server *Server
-	ch     chan *MessageStruct
+	send   chan *MessageStruct
 	done   chan bool
 }
 
@@ -25,13 +25,13 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 	}
 
 	//channel to send messages over.
-	ch := make(chan *MessageStruct, channelSize)
+	send := make(chan *MessageStruct, channelSize)
 
 	//channel to prompt the server when done.
 	done := make(chan bool)
 
 	//returns new struct.
-	return &Client{ws, server, ch, done}
+	return &Client{ws, server, send, done}
 }
 
 //getter for client connection
@@ -41,12 +41,15 @@ func (c *Client) Conn() *websocket.Conn {
 
 //get write channel. Implements Write method! :)
 func (c *Client) Write() chan<- *MessageStruct {
-	return (chan<- *MessageStruct)(c.ch)
+	return (chan<- *MessageStruct)(c.send)
 }
 
 func (c *Client) Listen() {
-	go c.writeToAll()
+	go c.sendLoop()
 	c.ListenToAll()
+	defer func() {
+
+	}()
 }
 
 //return done channel.
@@ -54,16 +57,17 @@ func (c *Client) Done() chan<- bool {
 	return (chan<- bool)(c.done)
 }
 
-func (c *Client) writeToAll() {
+func (c *Client) sendLoop() {
 	log.Println("Write to all")
 
 	for {
 		select {
-		case m := <-c.ch:
-			log.Println("Sending... ", m)
-			websocket.JSON.Send(c.ws, m)
+		case message := <-c.send:
+			log.Println("Sending... ", message)
+			websocket.JSON.Send(c.ws, message)
 
 		case <-c.done:
+			log.Println("Remove yourself!")
 			c.server.RemoveClient() <- c
 			c.done <- true
 			return
