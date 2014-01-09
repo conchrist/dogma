@@ -75,7 +75,6 @@ func (s *Server) Listen() {
 	onConnect := func(ws *websocket.Conn) {
 		client := NewClient(ws, s)
 		s.addClient <- client
-		//not yet implemented...
 		client.Listen()
 		defer ws.Close()
 	}
