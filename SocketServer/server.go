@@ -20,7 +20,9 @@ package SocketServer
 import (
 	"code.google.com/p/go.net/websocket"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -87,23 +89,23 @@ func (s *Server) Listen() {
 
 		//new client connecting
 		case newclient := <-s.addClient:
-			fmt.Println("New client added")
+			log.Println("New client with ip " + newclient.getIP() + " added")
 			s.clients[newclient] = true
 
-			//write all previous messages to client
+			//write all previous messages to clients
 			for _, msg := range s.messages {
 				newclient.Write() <- msg
 			}
-			fmt.Println("Connected clients: " + strconv.Itoa(len(s.clients)))
+			//fmt.Println("Connected clients: " + strconv.Itoa(len(s.clients)))
 
 		//client disconnected.
 		case removeClient := <-s.removeClient:
-			fmt.Println("Remove client")
 			delete(s.clients, removeClient)
+			log.Println("Client with ip " + removeClient.getIP() + " disconnected")
 
 		case sendall := <-s.sendAll:
 			message := sendall
-			fmt.Println("Broadcast all the messages")
+			//fmt.Println("Broadcast all the messages")
 			s.messages = append(s.messages, message)
 			for client, _ := range s.clients {
 				client.Write() <- message
@@ -112,6 +114,7 @@ func (s *Server) Listen() {
 		default:
 			//TODO: Remove for production.
 			//fmt.Println("Connected clients: " + strconv.Itoa(len(s.clients)))
+			fmt.Fprintln(os.Stderr, strconv.Itoa(len(s.clients)))
 
 		}
 	}

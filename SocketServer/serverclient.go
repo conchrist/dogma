@@ -56,6 +56,10 @@ func (c *Client) Conn() *websocket.Conn {
 	return c.ws
 }
 
+func (c *Client) getIP() string {
+	return c.Conn().Request().RemoteAddr
+}
+
 //get write channel. Implements Write method! :)
 func (c *Client) Write() chan<- *MessageStruct {
 	return (chan<- *MessageStruct)(c.send)
@@ -72,16 +76,16 @@ func (c *Client) Done() chan<- bool {
 }
 
 func (c *Client) sendLoop() {
-	log.Println("Write to all")
+	//log.Println("Write to all")
 
 	for {
 		select {
 		case message := <-c.send:
-			log.Println("Sending... ", message)
+			//log.Println("Sending... ", message)
 			websocket.JSON.Send(c.ws, message)
 
 		case <-c.done:
-			log.Println("Remove yourself!")
+			//log.Println("Remove yourself!")
 			c.server.RemoveClient() <- c
 			c.done <- true
 			return
@@ -90,11 +94,11 @@ func (c *Client) sendLoop() {
 }
 
 func (c *Client) ListenToAll() {
-	log.Println("Listening to all clients")
+	//log.Println("Listening to all clients")
 	for {
 		select {
 		case <-c.done:
-			log.Println("Remove yourself!")
+			//log.Println("Remove yourself!")
 			c.server.RemoveClient() <- c
 			c.done <- true
 			return
