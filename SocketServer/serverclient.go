@@ -47,9 +47,6 @@ func (c *Client) Write() chan<- *MessageStruct {
 func (c *Client) Listen() {
 	go c.sendLoop()
 	c.ListenToAll()
-	defer func() {
-
-	}()
 }
 
 //return done channel.
