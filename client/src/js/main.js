@@ -83,7 +83,7 @@
     if(path[0] === '/') {
       path = path.slice(1,path.length);
     }
-    var ws = new WebSocket('ws://'+host+':'+port+'/'+path);
+    var ws = new WebSocket('wss://'+host+':'+port+'/'+path);
     return ws; 
   }
 

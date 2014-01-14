@@ -20,6 +20,7 @@ package SocketServer
 import (
 	"code.google.com/p/go.net/websocket"
 	"log"
+	"time"
 )
 
 //Holds 1000 messages at once.
@@ -108,8 +109,21 @@ func (c *Client) ListenToAll() {
 			if err != nil {
 				//something is wrong, close yourself
 				c.done <- true
-			} else {
+				continue
+			}
+			switch message.Type {
+			case "message":
 				c.server.BroadCast() <- &message
+				break
+			case "user":
+				userMessage := &MessageStruct{
+					From:    c.getIP(),
+					Message: c.getIP(),
+					Type:    "user",
+					Time:    int(time.Now().UnixNano() % 1e6 / 1e3),
+				}
+				c.Write() <- userMessage
+				break
 			}
 		}
 	}

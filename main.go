@@ -45,7 +45,7 @@ func main() {
 		path := "client/" + r.URL.Path
 		http.ServeFile(w, r, path)
 	})
-	err := http.ListenAndServe(":4000", nil)
+	err := http.ListenAndServeTLS(":4000", "ssl/cert.pem", "ssl/key.pem", nil)
 	if err != nil {
 		panic("ListenAndServe: " + err.Error())
 	}

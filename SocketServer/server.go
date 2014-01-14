@@ -22,8 +22,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"strconv"
 )
 
 type Server struct {
@@ -96,7 +94,6 @@ func (s *Server) Listen() {
 			for _, msg := range s.messages {
 				newclient.Write() <- msg
 			}
-			//fmt.Println("Connected clients: " + strconv.Itoa(len(s.clients)))
 
 		//client disconnected.
 		case removeClient := <-s.removeClient:
@@ -110,12 +107,6 @@ func (s *Server) Listen() {
 			for client, _ := range s.clients {
 				client.Write() <- message
 			}
-
-		default:
-			//TODO: Remove for production.
-			//fmt.Println("Connected clients: " + strconv.Itoa(len(s.clients)))
-			fmt.Fprintln(os.Stderr, strconv.Itoa(len(s.clients)))
-
 		}
 	}
 }

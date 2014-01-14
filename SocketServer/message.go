@@ -19,6 +19,7 @@ package SocketServer
 
 type MessageStruct struct {
 	From    string `json:"from"`
-	Message string `json:"message"`
+	Message string `json:"body"`
+	Type    string `json:"type"`
 	Time    int    `json:"time"`
 }
