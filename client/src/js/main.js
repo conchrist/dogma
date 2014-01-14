@@ -15,13 +15,13 @@
  * along with GoWebSocket.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-(function (window) {
+(function (window, document) {
   "use strict";
 
-  var username = 'USERNAME';
+  var username;
+  var form = document.getElementById('sendForm');
   var textField = document.getElementById('textField');
   var sendButton = document.getElementById('sendButton');
-  var pingButton = document.getElementById('pingButton');
   var socket;
 
 
@@ -37,6 +37,7 @@
       var object = JSON.parse(data);
       if(object.type === 'message') {
         messages.push(object);
+        renderMessages();
         console.log("Message received", object);
       } else if (object.type === 'user') {
         username = object.body;
@@ -50,44 +51,46 @@
 
   var messages = [];
 
-  Object.observe(messages, function(changes) {
+  /*Object.observe(messages, function(changes) {
     renderMessages();
-  });
+  });*/
 
   function renderMessages() {
+    var listMessages = messages.slice(0);
+    if(document.documentElement.clientWidth <= 480) {
+      window.scrollTo(0,document.body.scrollHeight)
+    }
+    else {
+      listMessages = listMessages.reverse(); 
+    }
     var messageElem = document.getElementById('messages');
     messageElem.innerHTML = '';
-    messages.forEach(function (message) {
+    listMessages.forEach(function (message) {
       var li = document.createElement('li');
       var textNode = document.createTextNode(message.from+': '+message.body);
       li.appendChild(textNode);
       messageElem.appendChild(li);
     });
+    console.log(document.documentElement.clientWidth, document.body.scrollHeight)
+
   }
 
   function requestUsername() {
     var object = {
-      type: 'user'
+      type: 'user',
+      time: Date.now()
     };
     var string = JSON.stringify(object);
     socket.send(string);
   }
 
-
-  textField.addEventListener('keyup', function (event) {
-    var keyCode = event.keyCode;
-    console.log(keyCode);
-    if(keyCode === 13) {
-      handleText();
-    }
-  }, false);
-
   sendButton.addEventListener('click', function () {
     handleText();
   });
 
-  pingButton.addEventListener('click', function () {
-    sendMessage('Pong', socket);
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    handleText();
   });
 
   function connect(host,port,path) {
@@ -102,6 +105,9 @@
   }
 
   function handleText() {
+    if(!username) {
+      return;
+    }
     var text = textField.value;
     console.log('Sending', text);
     sendMessage(text,socket);
@@ -115,7 +121,6 @@
       from: username,
       type: 'message'
     };
-    //messages.push(object);
     socket.send(JSON.stringify(object));
   }
 
@@ -124,4 +129,4 @@
     requestUsername: requestUsername
   };
 
-})(this);
+})(this, document);

@@ -31,7 +31,8 @@ var (
 )
 
 func pictures(rw http.ResponseWriter, req *http.Request) {
-	req.Header.Add("Content-Type", "image/jpeg")
+	remPartOfURL := req.URL.Path[len("/profilepic/"):]
+	rw.Header().Add("Content-Type", "image/jpeg")
 
 }
 
