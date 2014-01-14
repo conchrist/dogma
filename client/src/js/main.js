@@ -24,17 +24,23 @@
   var pingButton = document.getElementById('pingButton');
   var socket;
 
+
   function run () {
-    socket = connect('localhost', 4000,'/echo');
+    socket = connect(window.location.hostname, 4000,'/echo');
+
+    socket.onopen = function () {
+      requestUsername();
+    };
 
     socket.onmessage = function (evt) {
       var data = evt.data;
       var object = JSON.parse(data);
-      //Don't add your own messages to the list.
-      if(true || object.from !== username) {
+      if(object.type === 'message') {
         messages.push(object);
+        console.log("Message received", object);
+      } else if (object.type === 'user') {
+        username = object.body;
       }
-      console.log("Message received", object);
     };
 
     socket.onerror = function (e) {
@@ -53,10 +59,18 @@
     messageElem.innerHTML = '';
     messages.forEach(function (message) {
       var li = document.createElement('li');
-      var textNode = document.createTextNode(message.from+': '+message.message);
+      var textNode = document.createTextNode(message.from+': '+message.body);
       li.appendChild(textNode);
       messageElem.appendChild(li);
     });
+  }
+
+  function requestUsername() {
+    var object = {
+      type: 'user'
+    };
+    var string = JSON.stringify(object);
+    socket.send(string);
   }
 
 
@@ -96,16 +110,18 @@
 
   function sendMessage(message, socket) {
     var object = {
-      message: message,
+      body: message,
       time: Date.now(),
-      from: username
+      from: username,
+      type: 'message'
     };
     //messages.push(object);
     socket.send(JSON.stringify(object));
   }
 
   window.main = {
-    run: run
+    run: run,
+    requestUsername: requestUsername
   };
 
 })(this);

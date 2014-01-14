@@ -113,9 +113,11 @@ func (c *Client) ListenToAll() {
 			}
 			switch message.Type {
 			case "message":
+				log.Printf("Message recieved %s\n", message.Message)
 				c.server.BroadCast() <- &message
 				break
 			case "user":
+				log.Printf("Username requested by %s\n", c.getIP())
 				userMessage := &MessageStruct{
 					From:    c.getIP(),
 					Message: c.getIP(),

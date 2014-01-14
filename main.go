@@ -23,7 +23,17 @@ import (
 	"html/template"
 	"net/http"
 	"runtime"
+	"strconv"
 )
+
+var (
+	port int = 4000
+)
+
+func pictures(rw http.ResponseWriter, req *http.Request) {
+	req.Header.Add("Content-Type", "image/jpeg")
+
+}
 
 func serveMain(rw http.ResponseWriter, req *http.Request) {
 	var template_file, _ = template.ParseFiles("client/src/views/index.html")
@@ -37,16 +47,27 @@ func init() {
 	runtime.GOMAXPROCS(*cores)
 }
 
+func redir(w http.ResponseWriter, req *http.Request) {
+	host := req.Host
+	http.Redirect(w, req, "https://"+host+":4000/", http.StatusMovedPermanently)
+}
+
 func main() {
 	server := SocketServer.NewServer("/echo")
 	go server.Listen()
+	http.HandleFunc("/profilepic/", pictures)
 	http.HandleFunc("/", serveMain)
 	http.HandleFunc("/public/", func(w http.ResponseWriter, r *http.Request) {
 		path := "client/" + r.URL.Path
 		http.ServeFile(w, r, path)
 	})
-	err := http.ListenAndServeTLS(":4000", "ssl/cert.pem", "ssl/key.pem", nil)
-	if err != nil {
-		panic("ListenAndServe: " + err.Error())
+	go func() {
+		err := http.ListenAndServeTLS(":"+strconv.Itoa(port), "ssl/server.crt", "ssl/server.key", nil)
+		if err != nil {
+			panic("ListenAndServe: " + err.Error())
+		}
+	}()
+	if err := http.ListenAndServe(":1337", http.HandlerFunc(redir)); err != nil {
+		panic("ListenAndServe error: " + err.Error())
 	}
 }
