@@ -21,19 +21,39 @@ import (
 	"flag"
 	"github.com/christopherL91/GoWebSocket/SocketServer"
 	"html/template"
+	"image/jpeg"
+	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
 	"runtime"
 	"strconv"
+	"strings"
 )
 
 var (
 	port int = 4000
 )
 
-func pictures(rw http.ResponseWriter, req *http.Request) {
-	remPartOfURL := req.URL.Path[len("/profilepic/"):]
-	rw.Header().Add("Content-Type", "image/jpeg")
+func servePictures(rw http.ResponseWriter, req *http.Request) {
+	rw.Header().Set("Content-Type", "image/jpeg")
+	pictureName := req.URL.Path[len("/profilepic/"):]
+	files, _ := ioutil.ReadDir("./photos")
 
+	for _, file := range files {
+		//match
+		if strings.TrimRight(file.Name(), ".jpg") == pictureName {
+			data, _ := os.Open("photos/" + file.Name())
+			defer data.Close()
+			jpgFile, err := jpeg.Decode(data)
+			if err != nil {
+				log.Fatal(err.Error())
+			}
+			jpeg.Encode(rw, jpgFile, nil)
+		}
+	}
+	//file not found
+	http.Error(rw, http.StatusText(404), 404)
 }
 
 func serveMain(rw http.ResponseWriter, req *http.Request) {
@@ -56,7 +76,7 @@ func redir(w http.ResponseWriter, req *http.Request) {
 func main() {
 	server := SocketServer.NewServer("/echo")
 	go server.Listen()
-	http.HandleFunc("/profilepic/", pictures)
+	http.HandleFunc("/profilepic/", servePictures)
 	http.HandleFunc("/", serveMain)
 	http.HandleFunc("/public/", func(w http.ResponseWriter, r *http.Request) {
 		path := "client/" + r.URL.Path
