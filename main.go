@@ -21,9 +21,8 @@ import (
 	"flag"
 	"github.com/christopherL91/GoWebSocket/SocketServer"
 	"html/template"
-	"image/jpeg"
+	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"runtime"
@@ -36,23 +35,20 @@ var (
 )
 
 func servePictures(rw http.ResponseWriter, req *http.Request) {
-	rw.Header().Set("Content-Type", "image/jpeg")
 	pictureName := req.URL.Path[len("/profilepic/"):]
 	files, _ := ioutil.ReadDir("./photos")
 
 	for _, file := range files {
 		//match
 		if strings.TrimRight(file.Name(), ".jpg") == pictureName {
+			rw.Header().Set("Content-Type", "image/jpeg")
 			data, _ := os.Open("photos/" + file.Name())
 			defer data.Close()
-			jpgFile, err := jpeg.Decode(data)
-			if err != nil {
-				log.Fatal(err.Error())
-			}
-			jpeg.Encode(rw, jpgFile, nil)
+			io.Copy(rw, data)
+			return
 		}
 	}
-	//file not found
+	//file not found, write 404 not found.
 	http.Error(rw, http.StatusText(404), 404)
 }
 
