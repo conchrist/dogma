@@ -20,8 +20,11 @@ package SocketServer
 import (
 	"code.google.com/p/go.net/websocket"
 	"fmt"
+	"labix.org/v2/mgo"
+	//"labix.org/v2/mgo/bson"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type Server struct {
@@ -31,18 +34,27 @@ type Server struct {
 	removeClient chan *Client
 	sendAll      chan *MessageStruct
 	messages     []*MessageStruct
+	dbMessages   *mgo.Collection
+	dbUsers      *mgo.Collection
 }
 
 func NewServer(path string) *Server {
-	tmp := Server{
+	session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+		log.Fatal("ERROR dialing db")
+	}
+
+	server := Server{
 		pathToServer: path,
 		clients:      make(map[*Client]bool),
 		addClient:    make(chan *Client),
 		removeClient: make(chan *Client),
 		sendAll:      make(chan *MessageStruct),
 		messages:     make([]*MessageStruct, 0),
+		dbMessages:   session.DB("Golang").C("Messages"),
+		dbUsers:      session.DB("Golang").C("Users"),
 	}
-	return &tmp
+	return &server
 }
 
 //channel to add a client to the chat.
@@ -61,17 +73,36 @@ func (s *Server) BroadCast() chan<- *MessageStruct {
 }
 
 //holds all the messages from clients.
-//why this??? copy all the messages to new client.
 func (s *Server) Messages() []*MessageStruct {
 	msgs := make([]*MessageStruct, len(s.messages))
 	copy(msgs, s.messages)
 	return msgs
 }
 
-//start server!
-func (s *Server) Listen() {
-	fmt.Println("Server listening")
+func (db *Server) sendMessagesToDB(message *MessageStruct) {
+	c := db.dbMessages
+	err := c.Insert(message)
+	if err != nil {
+		log.Fatal("ERROR inserting messsage into db")
+	}
+}
 
+func (db *Server) updateUsers(name string, remove bool) {
+	c := db.dbUsers
+	if remove == true {
+		//TODO
+	}
+	err := c.Insert(name)
+	if err != nil {
+		log.Fatal("Could not update name")
+	}
+}
+
+//start server!
+func (s *Server) Listen(port int) {
+	fmt.Println("Server started and listening on port " + strconv.Itoa(port))
+
+	//all new clients end up here...
 	onConnect := func(ws *websocket.Conn) {
 		client := NewClient(ws, s)
 		s.addClient <- client
@@ -84,13 +115,13 @@ func (s *Server) Listen() {
 	//listen for messages, clients and so on...
 	for {
 		select {
-
 		//new client connecting
 		case newclient := <-s.addClient:
-			log.Println("New client with ip " + newclient.getIP() + " added")
+			ip := newclient.getIP()
+			log.Println("New client with ip " + ip + " added")
 			s.clients[newclient] = true
 
-			//write all previous messages to clients
+			//write all previous messages to this client
 			for _, msg := range s.messages {
 				newclient.Write() <- msg
 			}
@@ -100,9 +131,9 @@ func (s *Server) Listen() {
 			delete(s.clients, removeClient)
 			log.Println("Client with ip " + removeClient.getIP() + " disconnected")
 
-		case sendall := <-s.sendAll:
-			message := sendall
-			//fmt.Println("Broadcast all the messages")
+		//new message came in, distribute to all clients and db.
+		case message := <-s.sendAll:
+			s.sendMessagesToDB(message)
 			s.messages = append(s.messages, message)
 			for client, _ := range s.clients {
 				client.Write() <- message

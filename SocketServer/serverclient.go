@@ -19,6 +19,7 @@ package SocketServer
 
 import (
 	"code.google.com/p/go.net/websocket"
+	uuid "github.com/nu7hatch/gouuid"
 	"log"
 )
 
@@ -27,6 +28,7 @@ const channelSize = 1000
 
 //holds all the info an client needs.
 type Client struct {
+	id     string
 	ws     *websocket.Conn
 	server *Server
 	send   chan *MessageStruct
@@ -41,6 +43,12 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 		log.Fatal("No server")
 	}
 
+	//new id to identify the user.
+	id, err := uuid.NewV4()
+	if err != nil {
+		log.Fatal("No uuid")
+	}
+
 	//channel to send messages over.
 	send := make(chan *MessageStruct, channelSize)
 
@@ -48,7 +56,12 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 	done := make(chan bool)
 
 	//returns new struct.
-	return &Client{ws, server, send, done}
+	return &Client{id.String(), ws, server, send, done}
+}
+
+//getter for client id
+func (c *Client) getID() string {
+	return c.id
 }
 
 //getter for client connection
@@ -60,7 +73,7 @@ func (c *Client) getIP() string {
 	return c.Conn().Request().RemoteAddr
 }
 
-//get write channel. Implements Write method! :)
+//get write channel.
 func (c *Client) Write() chan<- *MessageStruct {
 	return (chan<- *MessageStruct)(c.send)
 }
@@ -76,16 +89,12 @@ func (c *Client) Done() chan<- bool {
 }
 
 func (c *Client) sendLoop() {
-	//log.Println("Write to all")
-
 	for {
 		select {
 		case message := <-c.send:
-			//log.Println("Sending... ", message)
 			websocket.JSON.Send(c.ws, message)
 
 		case <-c.done:
-			//log.Println("Remove yourself!")
 			c.server.RemoveClient() <- c
 			c.done <- true
 			return
@@ -94,39 +103,29 @@ func (c *Client) sendLoop() {
 }
 
 func (c *Client) ListenToAll() {
-	//log.Println("Listening to all clients")
 	for {
-		select {
-		case <-c.done:
-			//log.Println("Remove yourself!")
-			c.server.RemoveClient() <- c
+		var message MessageStruct
+		err := websocket.JSON.Receive(c.ws, &message)
+		if err != nil {
 			c.done <- true
-			return
-		default:
-			var message MessageStruct
-			err := websocket.JSON.Receive(c.ws, &message)
-			if err != nil {
-				//something is wrong, close yourself
-				c.done <- true
-				continue
+			continue
+		}
+		//what message is coming?
+		switch message.Type {
+		case "message":
+			log.Println("Incoming message: " + message.Message + " from ip " + c.getIP())
+			c.server.BroadCast() <- &message
+			break
+		case "user":
+			ip := c.getIP()
+			userMessage := &MessageStruct{
+				From:    ip,
+				Message: ip,
+				Type:    "user",
+				Time:    message.Time,
 			}
-			switch message.Type {
-			case "message":
-				log.Printf("Message recieved %s\n", message.Message)
-				c.server.BroadCast() <- &message
-				break
-			case "user":
-				ip := c.getIP()
-				log.Printf("Username requested by %s\n", ip)
-				userMessage := &MessageStruct{
-					From:    ip,
-					Message: ip,
-					Type:    "user",
-					Time:    message.Time,
-				}
-				c.Write() <- userMessage
-				break
-			}
+			c.Write() <- userMessage
+			break
 		}
 	}
 }

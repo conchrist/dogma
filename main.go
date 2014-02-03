@@ -70,8 +70,8 @@ func redir(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	server := SocketServer.NewServer("/echo")
-	go server.Listen()
+	server := SocketServer.NewServer("/chat")
+	go server.Listen(port)
 	http.HandleFunc("/profilepic/", servePictures)
 	http.HandleFunc("/", serveMain)
 	http.HandleFunc("/public/", func(w http.ResponseWriter, r *http.Request) {
@@ -84,6 +84,7 @@ func main() {
 			panic("ListenAndServe: " + err.Error())
 		}
 	}()
+	//used for redir
 	if err := http.ListenAndServe(":1337", http.HandlerFunc(redir)); err != nil {
 		panic("ListenAndServe error: " + err.Error())
 	}

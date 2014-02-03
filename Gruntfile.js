@@ -54,6 +54,29 @@ module.exports = function(grunt) {
         }
       }
     },
+    "uglify-dev": {
+      options: {
+        banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n',
+        sourceMap: function(path) {
+          path = path.replace(/\.js$/,'.map');
+          return path;
+        },
+        sourceMappingURL: function(url) {
+          url = url.replace(/\.js$/,'.map');
+          url = url.replace('client/','/');
+          return url;
+        },
+        sourceMapPrefix: 3,
+        global_defs: {
+          DEBUG: true
+        }
+      },
+      dist: {
+        files: {
+          'client/public/js/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
+        }
+      }
+    },
     qunit: {
       files: ['test/**/*.html']
     },
@@ -71,9 +94,11 @@ module.exports = function(grunt) {
     },
     watch: {
       files: ['<%= jshint.files %>'],
-      tasks: ['jshint', 'qunit']
+      tasks: ['jshint']
     }
   });
+
+  grunt.loadNpmTasks('grunt-develop');
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -82,7 +107,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
 
   //grunt.registerTask('test', ['jshint', 'qunit']);
-
+  grunt.registerTask('dev', ['jshint', 'concat', 'uglify-dev']);
   grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
 
 };
