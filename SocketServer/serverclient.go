@@ -116,6 +116,7 @@ func (c *Client) ListenToAll() {
 			log.Println("Incoming message: " + message.Message + " from ip " + c.getIP())
 			c.server.BroadCast() <- &message
 			break
+		//client requested a username
 		case "user":
 			ip := c.getIP()
 			userMessage := &MessageStruct{
