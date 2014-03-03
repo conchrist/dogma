@@ -53,7 +53,7 @@ func servePictures(rw http.ResponseWriter, req *http.Request) {
 }
 
 func serveMain(rw http.ResponseWriter, req *http.Request) {
-	var template_file, _ = template.ParseFiles("client/src/views/index.html")
+	var template_file, _ = template.ParseFiles("client/public/src/views/index.html")
 	req.Header.Add("Content-Type", "application/javascript")
 	template_file.Execute(rw, nil)
 }
