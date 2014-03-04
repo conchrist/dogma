@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.3.0/pure-nr-min.css" />
+    <title>Whishlist</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  </head>
+  <style>
+  #title{text-decoration:underline;
+    text-shadow: 5px 5px 5px LawnGreen;
+    font-size: 50px;}
+
+  #small {font-size:20px;
+  text-decoration:underline;}
+
+  #box {font-size: 20px; background-color: Red;
+    margin: 10px;padding: 10px;padding-right: 10px;width: 300px;
+    }
+  </style>
+  <body style="margin: 20px;">
+    <center><p id="title">Wishes</p></center>
+
+    <p id="small">Add a wish here</p>
+    <form action="/whishes" method="POST" class="pure-form">
+      <input type="text" name="name" placeholder="Name "autocomplete="off" />
+      <input type="text" name="description" placeholder="Description" autocomplete="off" />
+      <input type="submit" value="Send" class="pure-button pure-button-primary"/>
+    </form>
+    <br>
+
+    {{range .}}
+      <div id="box">
+      {{.Name}} - {{.Description}}
+      </div>
+    {{ end }}
+
+  </body>
+</html>
