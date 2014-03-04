@@ -4,6 +4,7 @@ import (
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/binding"
 	"github.com/codegangsta/martini-contrib/render"
+	// "github.com/rakyll/statik/fs"
 	"labix.org/v2/mgo"
 	"net/http"
 )
@@ -16,12 +17,19 @@ func StartServer() {
 	//start martini
 	m := martini.Classic()
 
+	/*
+	* Not working yet. But when it works,
+	 */
+	// statikFS, err := fs.New()
+	// if err != nil {
+	// 	log.Fatalf(err.Error())
+	// }
+
 	//used to display html
 	m.Use(render.Renderer(render.Options{
 		Directory: forms,
 	}))
 
-	m.Use(martini.Static("pictures"))
 	/*
 	*	use mongoDB as database.
 	*	adress,DB
@@ -64,7 +72,7 @@ func StartServer() {
 	m.Post("/whishes", binding.Form(Wish{}), func(wish Wish, r render.Render, db *mgo.Database) {
 		if len(wish.Name) > 0 && len(wish.Description) > 0 {
 			//choose collection.
-			db.C("Whishes").Insert(wish)
+			db.C("wishes").Insert(wish)
 			//load template again.
 		}
 		r.HTML(200, "main", GetAll(db))
@@ -74,6 +82,7 @@ func StartServer() {
 		return "Sorry, did not find what you were looking for :("
 	})
 
+	// http.Handle("/templates/", http.StripPrefix("/templates/", http.FileServer(statikFS)))
 	m.Run()
 }
 

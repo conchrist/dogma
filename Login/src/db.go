@@ -27,6 +27,6 @@ func mongoDB(adress, db string) martini.Handler {
 //return all the wishes from the database.
 func GetAll(db *mgo.Database) []Wish {
 	var wishlist []Wish
-	db.C("Whishes").Find(nil).All(&wishlist)
+	db.C("wishes").Find(nil).All(&wishlist)
 	return wishlist
 }
