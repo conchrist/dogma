@@ -1,7 +1,6 @@
 package Login
 
 import (
-	"fmt"
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/binding"
 	"github.com/codegangsta/martini-contrib/render"
@@ -35,7 +34,7 @@ func StartServer() {
 	*	use mongoDB as database.
 	*	adress,DB
 	 */
-	m.Use(mongoDB("localhost", "whishDB"))
+	m.Use(mongoDB("localhost", "wishDB"))
 
 	//used to display html
 	m.Use(render.Renderer(render.Options{
@@ -43,7 +42,7 @@ func StartServer() {
 	}))
 
 	m.Get("/", func(r render.Render) {
-		r.Redirect("/login", 301)
+		r.Redirect("/login", 200)
 	})
 
 	m.Get("/login", func(r render.Render, db *mgo.Database) {
@@ -56,11 +55,11 @@ func StartServer() {
 		err := checkUser(userform.Username, hashedPass, db)
 		if err != nil {
 			r.Redirect(sessionauth.RedirectUrl)
-			return 501, "something wrong happened"
+			return 501, ""
 		} else {
-			err = sessionauth.AuthenticateSession(session, &user)
+			err := sessionauth.AuthenticateSession(session, &user)
 			if err != nil {
-				r.JSON(500, "wrong")
+				r.JSON(500, "Could not authenticate user")
 			}
 			params := req.URL.Query()
 			redirect := params.Get(sessionauth.RedirectParam)
@@ -69,28 +68,20 @@ func StartServer() {
 		}
 	})
 
-	/*
-	*	function to add user.
-	*	example:
-	*	curl --header "API-KEY:secretKey" --data "username=christopher&password=kalle" 	http://127.0.0.1:3000/addUser
-	*
-	 */
 	m.Post("/addUser", binding.Form(User{}), func(user User, db *mgo.Database) (int, string) {
-		fmt.Println("hello there")
 		hashedPass := hashPass(user.Password)
-		fmt.Println("hello")
-		tmp := addUser(user.Username, hashedPass, db)
-		if tmp != nil {
-			return 500, tmp.Error()
+		err := addUser(user.Username, hashedPass, db)
+		if err != nil {
+			return 401, err.Error()
 		}
 		return 200, "Added user"
 	})
 
-	m.Get("/whishes", sessionauth.LoginRequired, func(r render.Render, db *mgo.Database) {
+	m.Get("/wishes", func(r render.Render, db *mgo.Database) {
 		r.HTML(200, "main", GetAll(db))
 	})
 
-	m.Post("/whishes", sessionauth.LoginRequired, binding.Form(Wish{}), func(wish Wish, r render.Render, db *mgo.Database) {
+	m.Post("/wishes", binding.Form(Wish{}), func(wish Wish, r render.Render, db *mgo.Database) {
 		if len(wish.Name) > 0 && len(wish.Description) > 0 {
 			//choose collection.
 			db.C("wishes").Insert(wish)

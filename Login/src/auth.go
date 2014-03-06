@@ -23,13 +23,10 @@ func hashPass(pass string) string {
 	return hashedPass
 }
 
-/*
-* db.Users.find({username:"Kalle", password:1234})
- */
 func checkUser(username, password string, db *mgo.Database) error {
 	user := new(User)
-	coll := db.C("Users")
-	err := coll.Find(bson.M{"username": username, "password": password}).One(user)
+	collection := db.C("users")
+	err := collection.Find(bson.M{"username": username, "password": password}).One(user)
 	if err != nil {
 		//could not find user
 		return errors.New("Could not find user")
@@ -48,7 +45,7 @@ func addUser(username, password string, db *mgo.Database) error {
 	user.authenticated = true
 
 	//set collection in database.
-	collection := db.C("Users")
+	collection := db.C("users")
 
 	if err := collection.Insert(user); err != nil {
 		return errors.New("could not insert user")

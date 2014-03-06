@@ -19,8 +19,8 @@ func mongoDB(adress, db string) martini.Handler {
 	return func(c martini.Context) {
 		s := session.Clone()
 		c.Map(s.DB(db))
-		defer s.Close()
-		c.Next()
+		// defer s.Close()
+		// c.Next()
 	}
 }
 
