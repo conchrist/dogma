@@ -22,9 +22,14 @@ func StartServer() {
 	//start martini
 	m := martini.Classic()
 
-	// store.Options(sessions.Options{
-	// 	MaxAge: 0,
-	// })
+	store.Options(sessions.Options{
+		MaxAge: 0,
+	})
+
+	m.Use(sessions.Sessions("login_session", store))
+	m.Use(sessionauth.SessionUser(GenerateAnonymousUser))
+	sessionauth.RedirectUrl = "/login"
+	sessionauth.RedirectParam = "new-next"
 
 	/*
 	*	use mongoDB as database.
@@ -36,11 +41,6 @@ func StartServer() {
 	m.Use(render.Renderer(render.Options{
 		Directory: forms,
 	}))
-
-	m.Use(sessions.Sessions("login_session", store))
-	m.Use(sessionauth.SessionUser(GenerateAnonymousUser))
-	sessionauth.RedirectUrl = "/login"
-	sessionauth.RedirectParam = "new-next"
 
 	m.Get("/", func(r render.Render) {
 		r.Redirect("/login", 301)
