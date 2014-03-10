@@ -4,10 +4,8 @@ import (
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/binding"
 	"github.com/codegangsta/martini-contrib/render"
-	"github.com/martini-contrib/sessionauth"
-	"github.com/martini-contrib/sessions"
+	"github.com/codegangsta/martini-contrib/sessions"
 	"labix.org/v2/mgo"
-	"net/http"
 )
 
 const (
@@ -16,19 +14,17 @@ const (
 
 func StartServer() {
 
-	store := sessions.NewCookieStore([]byte("1234"))
-
 	//start martini
 	m := martini.Classic()
 
-	store.Options(sessions.Options{
-		MaxAge: 0,
-	})
+	store := sessions.NewCookieStore([]byte("mySuperSecretPassword1234"))
 
-	m.Use(sessions.Sessions("login_session", store))
-	m.Use(sessionauth.SessionUser(GenerateAnonymousUser))
-	sessionauth.RedirectUrl = "/login"
-	sessionauth.RedirectParam = "new-next"
+	m.Use(sessions.Sessions("login-session", store))
+
+	options := new(sessions.Options)
+	options.HttpOnly = true
+	options.MaxAge = 86400 * 7
+	store.Options(*options)
 
 	/*
 	*	use mongoDB as database.
@@ -45,30 +41,37 @@ func StartServer() {
 		r.Redirect("/login", 200)
 	})
 
-	m.Get("/login", func(r render.Render, db *mgo.Database) {
-		r.HTML(200, "login", nil)
-	})
-
-	m.Post("/login", binding.Form(User{}), func(session sessions.Session, userform User, r render.Render, db *mgo.Database, req *http.Request) (int, string) {
-		user := User{}
-		hashedPass := hashPass(userform.Password)
-		err := checkUser(userform.Username, hashedPass, db)
-		if err != nil {
-			r.Redirect(sessionauth.RedirectUrl)
-			return 501, ""
-		} else {
-			err := sessionauth.AuthenticateSession(session, &user)
-			if err != nil {
-				r.JSON(500, "Could not authenticate user")
-			}
-			params := req.URL.Query()
-			redirect := params.Get(sessionauth.RedirectParam)
-			r.Redirect(redirect)
-			return 200, "logged in"
+	m.Get("/login", func(r render.Render, db *mgo.Database, s sessions.Session) string {
+		//check if user has a session.
+		v := s.Get("userId")
+		if v != nil {
+			return "already logged in"
 		}
+		r.HTML(200, "login", nil)
+		return ""
 	})
 
-	m.Post("/addUser", binding.Form(User{}), func(user User, db *mgo.Database) (int, string) {
+	m.Post("/login", binding.Form(User{}), func(userform User, r render.Render, db *mgo.Database, s sessions.Session, c martini.Context) (int, string) {
+		hashedPass := hashPass(userform.Password)
+		Id, err := checkUser(userform.Username, hashedPass, db)
+		if err != nil {
+			return 401, err.Error()
+		}
+		s.Set("userId", Id)
+		name := userform.Username
+		return 200, "logged in as " + name
+	})
+
+	m.Get("/userID", func() string {
+		return "hej"
+	})
+
+	m.Get("/logout", func(s sessions.Session) string {
+		s.Delete("userId")
+		return "logged out"
+	})
+
+	m.Post("/addUser", binding.Form(User{}), func(user User, db *mgo.Database, r render.Render) (int, string) {
 		hashedPass := hashPass(user.Password)
 		err := addUser(user.Username, hashedPass, db)
 		if err != nil {
@@ -77,22 +80,17 @@ func StartServer() {
 		return 200, "Added user"
 	})
 
-	m.Get("/wishes", func(r render.Render, db *mgo.Database) {
+	m.Get("/wishes", RequireLogin, func(r render.Render, db *mgo.Database) {
 		r.HTML(200, "main", GetAll(db))
 	})
 
-	m.Post("/wishes", binding.Form(Wish{}), func(wish Wish, r render.Render, db *mgo.Database) {
+	m.Post("/wishes", RequireLogin, binding.Form(Wish{}), func(wish Wish, r render.Render, db *mgo.Database) {
 		if len(wish.Name) > 0 && len(wish.Description) > 0 {
 			//choose collection.
 			db.C("wishes").Insert(wish)
 		}
 		//load template again.
 		r.HTML(200, "main", GetAll(db))
-	})
-
-	m.Get("/logout", sessionauth.LoginRequired, func(session sessions.Session, user sessionauth.User, r render.Render) {
-		sessionauth.Logout(session, user)
-		r.Redirect("/")
 	})
 
 	m.NotFound(func() string {

@@ -4,16 +4,18 @@ import (
 	"crypto/sha512"
 	"encoding/base64"
 	"errors"
-	"github.com/martini-contrib/sessionauth"
+	"fmt"
+	"github.com/codegangsta/martini-contrib/render"
+	"github.com/codegangsta/martini-contrib/sessions"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
+	"net/http"
 )
 
 type User struct {
-	Id            string `form:"_id"`
-	Username      string `form:"username"`
-	Password      string `form:"password"`
-	authenticated bool   `form:"authenticated"`
+	UserID   bson.ObjectId `form:"userid"`
+	Username string        `form:"username"`
+	Password string        `form:"password"`
 }
 
 func hashPass(pass string) string {
@@ -23,18 +25,19 @@ func hashPass(pass string) string {
 	return hashedPass
 }
 
-func checkUser(username, password string, db *mgo.Database) error {
+func checkUser(username, password string, db *mgo.Database) (string, error) {
 	user := new(User)
 	collection := db.C("users")
 	err := collection.Find(bson.M{"username": username, "password": password}).One(user)
 	if err != nil {
 		//could not find user
-		return errors.New("Could not find user")
+		return "", errors.New("Could not find user")
 	}
+	//the password did not match
 	if user.Password != password {
-		return errors.New("Could not find user")
+		return "", errors.New("Could not find user")
 	}
-	return nil
+	return user.UserID.Hex(), nil
 }
 
 func addUser(username, password string, db *mgo.Database) error {
@@ -42,7 +45,7 @@ func addUser(username, password string, db *mgo.Database) error {
 	user := new(User)
 	user.Username = username
 	user.Password = password
-	user.authenticated = true
+	user.UserID = bson.NewObjectId()
 
 	//set collection in database.
 	collection := db.C("users")
@@ -53,34 +56,23 @@ func addUser(username, password string, db *mgo.Database) error {
 	return nil
 }
 
-//Part of the sessionauth API
-/*------------------------------------
- */
+//middleware!
+func RequireLogin(rw http.ResponseWriter, req *http.Request, db *mgo.Database, s sessions.Session, r render.Render) {
+	user := new(User)
+	collection := db.C("users")
+	id := s.Get("userId")
 
-func (u *User) IsAuthenticated() bool {
-	return u.authenticated
+	if id == nil {
+		fmt.Println("no cookie")
+		http.Redirect(rw, req, "http://nedry.ytmnd.com/", http.StatusFound)
+		return
+	} else {
+		idString := id.(string)
+		err := collection.Find(bson.M{"userid": bson.ObjectIdHex(idString)}).One(user)
+		if err != nil {
+			//the id was not found in the database! We have a scammer here! :P
+			http.Redirect(rw, req, "http://nedry.ytmnd.com/", http.StatusFound)
+			return
+		}
+	}
 }
-
-func (u *User) Login() {
-	u.authenticated = true
-}
-
-func (u *User) Logout() {
-	u.authenticated = false
-}
-
-func (u *User) UniqueId() interface{} {
-	return u.Id
-}
-
-func (u *User) GetById(id interface{}) error {
-	return nil
-}
-
-func GenerateAnonymousUser() sessionauth.User {
-	return &User{}
-}
-
-/*
-----------------------------------------
-*/
