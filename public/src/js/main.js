@@ -26,7 +26,7 @@
 
 
   function run () {
-    socket = connect('127.0.0.1',4000,'/chat');
+    socket = connect('considerate.com',4000,'/chatroom');
 
     socket.onopen = function () {
       requestUsername();
@@ -45,7 +45,7 @@
     };
 
     socket.onerror = function (e) {
-      console.log(e.data);
+      console.error(e.data);
     };
   }
 
@@ -97,6 +97,7 @@
     if(path[0] === '/') {
       path = path.slice(1,path.length);
     }
+    console.log('wss://'+host+':'+port+'/'+path);
     var ws = new WebSocket('wss://'+host+':'+port+'/'+path);
     return ws;
   }

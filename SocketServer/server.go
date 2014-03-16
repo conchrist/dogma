@@ -36,11 +36,6 @@ type Server struct {
 }
 
 func NewServer(path string) *Server {
-	session, err := mgo.Dial("127.0.0.1")
-	if err != nil {
-		log.Fatal("ERROR dialing db")
-	}
-
 	server := Server{
 		pathToServer: path,
 		clients:      make(map[*Client]bool),
@@ -48,8 +43,6 @@ func NewServer(path string) *Server {
 		removeClient: make(chan *Client),
 		sendAll:      make(chan *MessageStruct),
 		messages:     make([]*MessageStruct, 0),
-		dbMessages:   session.DB("Golang").C("Messages"),
-		dbUsers:      session.DB("Golang").C("Users"),
 	}
 	return &server
 }
@@ -76,42 +69,24 @@ func (s *Server) Messages() []*MessageStruct {
 	return msgs
 }
 
-func (db *Server) sendMessagesToDB(message *MessageStruct) {
-	c := db.dbMessages
-	err := c.Insert(message)
-	if err != nil {
-		log.Fatal("ERROR inserting messsage into db")
-	}
-}
-
-func (db *Server) updateUsers(name string, remove bool) {
-	c := db.dbUsers
-	if remove == true {
-		//TODO
-	}
-	err := c.Insert(name)
-	if err != nil {
-		log.Fatal("Could not update name")
-	}
-}
-
 //start server!
 func (s *Server) Listen() {
 	//all new clients end up here...
 	onConnect := func(ws *websocket.Conn) {
 		client := NewClient(ws, s)
+		log.Println("hejsan")
 		s.addClient <- client
 		client.Listen()
 		defer ws.Close()
 	}
 	//new connections will have this handler.
-	http.Handle("/chat", websocket.Handler(onConnect))
-
+	http.Handle(s.pathToServer, websocket.Handler(onConnect))
 	//listen for messages, clients and so on...
 	for {
 		select {
 		//new client connecting
 		case newclient := <-s.addClient:
+			log.Println("hello")
 			ip := newclient.getIP()
 			log.Println("New client with ip " + ip + " added")
 			s.clients[newclient] = true
@@ -128,7 +103,6 @@ func (s *Server) Listen() {
 
 		//new message came in, distribute to all clients and db.
 		case message := <-s.sendAll:
-			s.sendMessagesToDB(message)
 			s.messages = append(s.messages, message)
 			for client, _ := range s.clients {
 				client.Write() <- message

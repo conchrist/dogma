@@ -27,10 +27,4 @@ _testmain.go
 main
 
 client/public/js
-
-
-*.p12
-*.cer
-*.crt
-*.csr
-*.key
+SocketServer/ssl

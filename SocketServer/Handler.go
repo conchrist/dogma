@@ -20,10 +20,12 @@ var (
 	errMessage = new(Error)
 )
 
-func StartServer() {
-
-	server := NewServer("/chatSocket")
+func init() {
+	server := NewServer("/chatroom")
 	go server.Listen()
+}
+
+func StartServer() {
 
 	errMessage.ErrorData = "Fill in missing data"
 
@@ -39,7 +41,8 @@ func StartServer() {
 
 	options := new(sessions.Options)
 	options.Secure = true
-	options.MaxAge = 86400 * 7
+	options.HttpOnly = true
+	options.MaxAge = 86400 //1 day
 	store.Options(*options)
 
 	m.Get("/", func(rw http.ResponseWriter, req *http.Request) {
@@ -75,7 +78,7 @@ func StartServer() {
 		return "logged out"
 	})
 
-	m.Get("/chatroom", RequireLogin, func(r render.Render) {
+	m.Get("/chat", RequireLogin, func(r render.Render, req *http.Request) {
 		r.HTML(200, "chat", nil)
 	})
 
