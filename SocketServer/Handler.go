@@ -5,7 +5,9 @@ import (
 	"github.com/codegangsta/martini-contrib/binding"
 	"github.com/codegangsta/martini-contrib/render"
 	"github.com/codegangsta/martini-contrib/sessions"
+	"github.com/russross/blackfriday"
 	"io"
+	"io/ioutil"
 	"labix.org/v2/mgo"
 	"log"
 	"net/http"
@@ -106,6 +108,24 @@ func StartServer() {
 		data, _ := os.Open("public/pictures/gopher.jpeg")
 		defer data.Close()
 		io.Copy(rw, data)
+	})
+
+	m.Get("/license", func(rw http.ResponseWriter) {
+		input, err := ioutil.ReadFile("public/markdown/license.md")
+		if err != nil {
+			log.Println(err.Error())
+		}
+		markdown := blackfriday.MarkdownCommon(input)
+		rw.Write(markdown)
+	})
+
+	m.Get("/about", func(rw http.ResponseWriter) {
+		input, err := ioutil.ReadFile("public/markdown/about.md")
+		if err != nil {
+			log.Println(err.Error())
+		}
+		markdown := blackfriday.MarkdownCommon(input)
+		rw.Write(markdown)
 	})
 
 	log.Fatal(http.ListenAndServeTLS(":4000", "SocketServer/ssl/server.crt", "SocketServer/ssl/server.key", m))
