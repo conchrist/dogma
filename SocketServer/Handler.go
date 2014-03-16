@@ -75,7 +75,7 @@ func StartServer() {
 		return "logged out"
 	})
 
-	m.Get("/chat", RequireLogin, func(r render.Render) {
+	m.Get("/chatroom", RequireLogin, func(r render.Render) {
 		r.HTML(200, "chat", nil)
 	})
 

@@ -105,7 +105,7 @@ func (s *Server) Listen() {
 		defer ws.Close()
 	}
 	//new connections will have this handler.
-	http.Handle(s.pathToServer, websocket.Handler(onConnect))
+	http.Handle("/chat", websocket.Handler(onConnect))
 
 	//listen for messages, clients and so on...
 	for {

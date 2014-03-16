@@ -26,7 +26,7 @@
 
 
   function run () {
-    socket = connect(window.location.hostname, 4000,'/chatSocket');
+    socket = connect('127.0.0.1',4000,'/chat');
 
     socket.onopen = function () {
       requestUsername();
@@ -45,7 +45,7 @@
     };
 
     socket.onerror = function (e) {
-      console.err(e);
+      console.log(e.data);
     };
   }
 
