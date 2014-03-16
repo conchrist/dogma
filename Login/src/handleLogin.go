@@ -51,7 +51,7 @@ func StartServer() {
 		return ""
 	})
 
-	m.Post("/login", binding.Form(User{}), func(userform User, r render.Render, db *mgo.Database, s sessions.Session, c martini.Context) (int, string) {
+	m.Post("/login", binding.Form(User{}), func(userform User, r render.Render, db *mgo.Database, s sessions.Session) (int, string) {
 		hashedPass := hashPass(userform.Password)
 		Id, err := checkUser(userform.Username, hashedPass, db)
 		if err != nil {

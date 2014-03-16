@@ -26,7 +26,7 @@
 
 
   function run () {
-    socket = connect(window.location.hostname, 4000,'/echo');
+    socket = connect(window.location.hostname, 4000,'/chatSocket');
 
     socket.onopen = function () {
       requestUsername();
@@ -51,9 +51,6 @@
 
   var messages = [];
 
-  /*Object.observe(messages, function(changes) {
-    renderMessages();
-  });*/
 
   function renderMessages() {
     var listMessages = messages.slice(0);
@@ -61,7 +58,7 @@
       window.scrollTo(0,document.body.scrollHeight)
     }
     else {
-      listMessages = listMessages.reverse(); 
+      listMessages = listMessages.reverse();
     }
     var messageElem = document.getElementById('messages');
     messageElem.innerHTML = '';
@@ -101,7 +98,7 @@
       path = path.slice(1,path.length);
     }
     var ws = new WebSocket('wss://'+host+':'+port+'/'+path);
-    return ws; 
+    return ws;
   }
 
   function handleText() {

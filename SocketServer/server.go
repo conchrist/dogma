@@ -19,12 +19,9 @@ package SocketServer
 
 import (
 	"code.google.com/p/go.net/websocket"
-	"fmt"
 	"labix.org/v2/mgo"
-	//"labix.org/v2/mgo/bson"
 	"log"
 	"net/http"
-	"strconv"
 )
 
 type Server struct {
@@ -99,9 +96,7 @@ func (db *Server) updateUsers(name string, remove bool) {
 }
 
 //start server!
-func (s *Server) Listen(port int) {
-	fmt.Println("Server started and listening on port " + strconv.Itoa(port))
-
+func (s *Server) Listen() {
 	//all new clients end up here...
 	onConnect := func(ws *websocket.Conn) {
 		client := NewClient(ws, s)

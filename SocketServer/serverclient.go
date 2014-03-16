@@ -19,7 +19,6 @@ package SocketServer
 
 import (
 	"code.google.com/p/go.net/websocket"
-	uuid "github.com/nu7hatch/gouuid"
 	"log"
 )
 
@@ -28,7 +27,6 @@ const channelSize = 1000
 
 //holds all the info an client needs.
 type Client struct {
-	id     string
 	ws     *websocket.Conn
 	server *Server
 	send   chan *MessageStruct
@@ -43,12 +41,6 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 		log.Fatal("No server")
 	}
 
-	//new id to identify the user.
-	id, err := uuid.NewV4()
-	if err != nil {
-		log.Fatal("No uuid")
-	}
-
 	//channel to send messages over.
 	send := make(chan *MessageStruct, channelSize)
 
@@ -56,12 +48,7 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 	done := make(chan bool)
 
 	//returns new struct.
-	return &Client{id.String(), ws, server, send, done}
-}
-
-//getter for client id
-func (c *Client) getID() string {
-	return c.id
+	return &Client{ws, server, send, done}
 }
 
 //getter for client connection
