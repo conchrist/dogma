@@ -28,3 +28,4 @@ main
 
 client/public/js
 SocketServer/ssl
+GoWebSocket
