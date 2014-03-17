@@ -21,7 +21,6 @@ import (
 	"code.google.com/p/go.net/websocket"
 	"labix.org/v2/mgo"
 	"log"
-	"net/http"
 )
 
 type Server struct {
@@ -69,24 +68,22 @@ func (s *Server) Messages() []*MessageStruct {
 	return msgs
 }
 
-//start server!
-func (s *Server) Listen() {
-	//all new clients end up here...
-	onConnect := func(ws *websocket.Conn) {
+func (s *Server) onConnectHandler() websocket.Handler {
+	return websocket.Handler(func(ws *websocket.Conn) {
+		defer ws.Close()
 		client := NewClient(ws, s)
-		log.Println("hejsan")
 		s.addClient <- client
 		client.Listen()
-		defer ws.Close()
-	}
-	//new connections will have this handler.
-	http.Handle(s.pathToServer, websocket.Handler(onConnect))
+	})
+}
+
+//start server!
+func (s *Server) Listen() {
 	//listen for messages, clients and so on...
 	for {
 		select {
 		//new client connecting
 		case newclient := <-s.addClient:
-			log.Println("hello")
 			ip := newclient.getIP()
 			log.Println("New client with ip " + ip + " added")
 			s.clients[newclient] = true

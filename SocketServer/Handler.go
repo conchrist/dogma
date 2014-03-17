@@ -22,11 +22,6 @@ var (
 	errMessage = new(Error)
 )
 
-func init() {
-	server := NewServer("/chatroom")
-	go server.Listen()
-}
-
 func StartServer() {
 
 	errMessage.ErrorData = "Fill in missing data"
@@ -62,8 +57,7 @@ func StartServer() {
 
 	m.Post("/login", binding.Form(User{}), func(user User, db *mgo.Database, r render.Render, s sessions.Session) (int, string) {
 		if len(user.Username) > 0 && len(user.Password) > 0 {
-			hashedPass := hashPass(user.Password)
-			ID, err := authUser(user.Username, hashedPass, "check", db)
+			ID, err := authUser(user.Username, user.Password, "check", db)
 			if err != nil {
 				return 401, err.Error()
 			}
@@ -80,21 +74,21 @@ func StartServer() {
 		return "logged out"
 	})
 
-	m.Get("/chat", RequireLogin, func(r render.Render, req *http.Request) {
-		r.HTML(200, "chat", nil)
-	})
-
 	m.Get("/newuser", func(r render.Render) {
 		r.HTML(200, "new", nil)
 	})
 
 	m.Post("/newuser", binding.Form(User{}), func(user User, r render.Render, db *mgo.Database, s sessions.Session) (int, string) {
 		if len(user.Username) > 0 && len(user.Password) > 0 {
-			hashedPass := hashPass(user.Password)
+			hashedPass, err := hashPass(user.Password)
+			if err != nil {
+				return 401, err.Error()
+			}
 			ID, err := authUser(user.Username, hashedPass, "add", db)
 			if err != nil {
 				return 401, err.Error()
 			}
+			log.Println(ID)
 			s.Set("userId", ID)
 		} else {
 			r.HTML(200, "new", errMessage)
@@ -126,6 +120,22 @@ func StartServer() {
 		}
 		markdown := blackfriday.MarkdownCommon(input)
 		rw.Write(markdown)
+	})
+	//---------------------------------------------------------------
+	// //Secured routes
+	// m.Use(RequireLogin())
+
+	m.Get("/chat", RequireLogin, func(r render.Render, req *http.Request) {
+		r.HTML(200, "chat", nil)
+	})
+
+	//---------------------------------------------------------------
+
+	server := NewServer("/chatroom")
+	go server.Listen()
+	m.Get("/chatroom", RequireLogin, func(res http.ResponseWriter, req *http.Request) {
+		handler := server.onConnectHandler()
+		handler.ServeHTTP(res, req)
 	})
 
 	log.Fatal(http.ListenAndServeTLS(":4000", "SocketServer/ssl/server.crt", "SocketServer/ssl/server.key", m))
