@@ -26,7 +26,7 @@
 
 
   function run () {
-    socket = connect(window.location.hostname, 4000,'/echo');
+    socket = connect('considerate.com',4000,'/chatroom');
 
     socket.onopen = function () {
       requestUsername();
@@ -45,15 +45,12 @@
     };
 
     socket.onerror = function (e) {
-      console.err(e);
+      console.error(e.data);
     };
   }
 
   var messages = [];
 
-  /*Object.observe(messages, function(changes) {
-    renderMessages();
-  });*/
 
   function renderMessages() {
     var listMessages = messages.slice(0);
@@ -61,7 +58,7 @@
       window.scrollTo(0,document.body.scrollHeight)
     }
     else {
-      listMessages = listMessages.reverse(); 
+      listMessages = listMessages.reverse();
     }
     var messageElem = document.getElementById('messages');
     messageElem.innerHTML = '';
@@ -100,8 +97,9 @@
     if(path[0] === '/') {
       path = path.slice(1,path.length);
     }
+    console.log('wss://'+host+':'+port+'/'+path);
     var ws = new WebSocket('wss://'+host+':'+port+'/'+path);
-    return ws; 
+    return ws;
   }
 
   function handleText() {

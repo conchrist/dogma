@@ -1,0 +1,37 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/bootstrap-3.1.1-dist/css/bootstrap.css">
+    <title>Register new user</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=no">
+  </head>
+
+  <style>
+  #title{font-size: 30px;}
+  #button{margin-top: 0.5cm}
+  #form{margin-top: 0.5cm}
+  #error{color: red; font-size: 20px}
+  </style>
+
+  <body style="margin: 20px;">
+
+    <center><p class="span8" id="title">Create user</p></center>
+
+    <p class="span8">Fill in information</p>
+    <p id="error">{{.ErrorData}}</p>
+    <form action="/newuser" method="POST">
+      <input type="text" name="username" placeholder="Name "autocomplete="off" class="form-control" id="form" />
+      <input type="password" name="password" placeholder="password" autocomplete="off" class="form-control" id="form" />
+      <input type="submit" class="btn btn-default btn-success btn-lg" value="Create user" id="form">
+    </form>
+
+    <a href="/login" class="btn btn-default btn-danger btn-lg"><span class="glyphicon glyphicon-remove"></span> abort</a>
+
+  <hr>
+  <div class="footer">
+  <a href="http://github.com/christopherL91" class="btn btn-default btn-link btn-lg"><span class="glyphicon glyphicon-bookmark"></span>Christopher Lillthors</a>
+  <p>&copy; 2014</p>
+  </div>
+
+  </body>
+</html>
