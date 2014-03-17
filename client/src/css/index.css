@@ -1,0 +1,97 @@
+*, *:before, *:after {
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+html, body {
+	font-family: -apple-system-font ,'Helvetica Neue Interface P3' ,'Helvetica Neue' ,HelveticaNeue ,Helvetica, Verdana, sans-serif; 
+	
+}
+
+.main {
+	max-width: 800px;
+	position: relative;
+}
+
+.topfield {
+	position: relative;
+	width: 100%;
+	height: 30px;
+}
+
+@media (max-width: 480px) {
+	.topfield  {
+		position: fixed; 
+		bottom: 0;
+	}
+	#messages {
+		max-height: 100%;
+		padding-bottom: 30px;
+	}
+	.main {
+		padding-bottom: 30px;
+	}
+}
+
+.topfield > #textField {
+	width: 80%;
+	margin: 0;
+	float: left;
+	height: 100%;
+}
+
+.topfield > #sendButton {
+	width: 20%;
+	margin: 0;
+	float: left;
+	height: 100%;
+}
+
+.topfield:after {
+	clear: both;
+}
+
+#messages {
+	list-style: none;
+	padding: 0;
+}
+
+#messages li {
+	border-bottom: 1px solid lightgrey; 
+	padding: 0;
+}
+
+ul#messages {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid lightgrey;
+}
+ 
+#messages li {
+  font-size: 20px/1.5;
+  font-weight: 200;
+  border-bottom: 1px solid #ccc;
+}
+ 
+#messages li:last-child {
+  border: none;
+}
+ 
+#messages li a {
+  text-decoration: none;
+  color: #000;
+  display: block;
+  width: 200px;
+ 
+  -webkit-transition: font-size 0.3s ease, background-color 0.3s ease;
+  -moz-transition: font-size 0.3s ease, background-color 0.3s ease;
+  -o-transition: font-size 0.3s ease, background-color 0.3s ease;
+  -ms-transition: font-size 0.3s ease, background-color 0.3s ease;
+  transition: font-size 0.3s ease, background-color 0.3s ease;
+}
+ 
+#messages li a:hover {
+  font-size: 30px;
+  background: #f6f6f6;
+}

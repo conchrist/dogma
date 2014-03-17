@@ -1,4 +1,0 @@
-AUTHORS:
-
-Christopher Lillthors christopher.lillthors@gmail.com @github christopherL91
-Viktor Kronvall @github Considerate

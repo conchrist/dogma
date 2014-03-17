@@ -21,22 +21,39 @@ import (
 	"flag"
 	"github.com/christopherL91/GoWebSocket/SocketServer"
 	"html/template"
+	"io"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"runtime"
 	"strconv"
+	"strings"
 )
 
 var (
 	port int = 4000
 )
 
-func pictures(rw http.ResponseWriter, req *http.Request) {
-	req.Header.Add("Content-Type", "image/jpeg")
+func servePictures(rw http.ResponseWriter, req *http.Request) {
+	pictureName := req.URL.Path[len("/profilepic/"):]
+	files, _ := ioutil.ReadDir("./photos")
 
+	for _, file := range files {
+		//match
+		if strings.TrimRight(file.Name(), ".jpg") == pictureName {
+			rw.Header().Set("Content-Type", "image/jpeg")
+			data, _ := os.Open("photos/" + file.Name())
+			defer data.Close()
+			io.Copy(rw, data)
+			return
+		}
+	}
+	//file not found, write 404 not found.
+	http.Error(rw, http.StatusText(404), 404)
 }
 
 func serveMain(rw http.ResponseWriter, req *http.Request) {
-	var template_file, _ = template.ParseFiles("client/src/views/index.html")
+	var template_file, _ = template.ParseFiles("client/public/src/views/index.html")
 	req.Header.Add("Content-Type", "application/javascript")
 	template_file.Execute(rw, nil)
 }
@@ -53,9 +70,9 @@ func redir(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	server := SocketServer.NewServer("/echo")
-	go server.Listen()
-	http.HandleFunc("/profilepic/", pictures)
+	server := SocketServer.NewServer("/chat")
+	go server.Listen(port)
+	http.HandleFunc("/profilepic/", servePictures)
 	http.HandleFunc("/", serveMain)
 	http.HandleFunc("/public/", func(w http.ResponseWriter, r *http.Request) {
 		path := "client/" + r.URL.Path
@@ -67,6 +84,7 @@ func main() {
 			panic("ListenAndServe: " + err.Error())
 		}
 	}()
+	//used for redir
 	if err := http.ListenAndServe(":1337", http.HandlerFunc(redir)); err != nil {
 		panic("ListenAndServe error: " + err.Error())
 	}
