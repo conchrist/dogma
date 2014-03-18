@@ -54,7 +54,8 @@ func StartServer() {
 		if len(user.Username) > 0 && len(user.Password) > 0 {
 			UserID, err := authenticateUser(user.Username, user.Password, db)
 			if err != nil {
-				return 401, err.Error()
+				r.JSON(401, map[string]interface{}{"error": err.Error()})
+				return
 			}
 			s.Set("UserID", UserID)
 			s.Set("Username", user.Username)
@@ -90,7 +91,7 @@ func StartServer() {
 			}
 			s.Set("userId", UserID)
 			r.JSON(200, map[string]interface{}{"status": "user added"})
-			return 200, ""
+			return
 		}
 	})
 

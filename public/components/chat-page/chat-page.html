@@ -1,8 +1,10 @@
 <link rel="import" href="../../components/chat-login/chat-login.html">
+<link rel="import" href="../../components/chat-register/chat-register.html">
 <link rel="import" href="../../components/chat-room/chat-room.html">
 <polymer-element name="chat-page">
 	<template>
-	    <chat-login id="login" on-login="{{handleLogin}}"></chat-login>
+	    <chat-login id="login" on-new-user="{{register}}" on-login="{{handleLogin}}"></chat-login>
+	    <chat-register id="register" hidden on-register="{{registered}}" on-back="{{registrationAborted}}"></chat-register>
 	    <chat-room id="room" hidden></chat-room>
 	    <div class="footer">
 	      <a href="http://github.com/christopherL91" class="btn btn-default btn-link">

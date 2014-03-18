@@ -1,9 +1,8 @@
-
 <link rel="import" href="../../../bower/polymer-ajax/polymer-ajax.html">
 <polymer-element name="chat-login">
 	<template>
-	<link href="chat-login.css" rel="stylesheet">
-	<div class="jumbotron">
+	  <link href="chat-login.css" rel="stylesheet">
+	  <div class="jumbotron">
   		<h1>Login</h1>
   		<p>Login to chat</p>
   	</div>
@@ -14,10 +13,9 @@
         <input type="password" name="password" id="password"
         placeholder="password" required autocomplete="off"class="form-control"
         id="form" pattern="[a-zA-Z0-9]{0,10}" />
-        
-        <a href="/newuser" id="button" class="col-md-4 btn btn-default btn-info btn-lg">
+        <button id="button" on-click="{{register}}" class="col-md-4 btn btn-default btn-info btn-lg">
           <span class="glyphicon glyphicon-user"></span> New user
-        </a>
+        </button>
 	      <input type="submit"
 	      class="col-md-8 btn btn-default btn-success btn-lg"
 	      value="Login" id="button">

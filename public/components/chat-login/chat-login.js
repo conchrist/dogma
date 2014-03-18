@@ -20,6 +20,13 @@ Polymer('chat-login', {
             ajax.go();
         }.bind(this));
     },
+    register: function(event) {
+        event.preventDefault();
+        this.asyncFire('new-user', {
+            username: this.$.username.value,
+            password: this.$.password.value
+        });
+    },
     handleLogin: function(event) {
         console.log('Logged in', event.detail.response);
         var user = event.detail.response;
