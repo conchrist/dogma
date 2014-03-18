@@ -14,20 +14,13 @@ import (
 	"os"
 )
 
-type Error struct {
-	ErrorData string
-}
-
-var (
-	errMessage = new(Error)
-)
-
 func StartServer() {
-
-	errMessage.ErrorData = "Fill in missing data"
 
 	m := martini.Classic()
 	store := sessions.NewCookieStore([]byte("mySuperSecretPassword1234"))
+	m.Use(martini.Static("bower_components", martini.StaticOptions{
+		Prefix: "bower",
+	}))
 
 	m.Use(sessions.Sessions("login-session", store))
 	m.Use(mongoDB("localhost", "Golang"))
@@ -63,7 +56,7 @@ func StartServer() {
 			}
 			s.Set("userId", ID)
 		} else {
-			r.HTML(200, "login", errMessage)
+			r.HTML(200, "login", nil)
 			return 401, ""
 		}
 		return 200, "logged in"
@@ -91,7 +84,7 @@ func StartServer() {
 			log.Println(ID)
 			s.Set("userId", ID)
 		} else {
-			r.HTML(200, "new", errMessage)
+			r.HTML(200, "new", nil)
 			return 401, ""
 		}
 		return 200, "Successfully addded new user"
