@@ -91,6 +91,7 @@ func StartServer() {
 			}
 			s.Set("userId", UserID)
 			r.JSON(200, map[string]interface{}{"status": "user added"})
+			return 200, ""
 		}
 		return 500, "Internal server error"
 	})
