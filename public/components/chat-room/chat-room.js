@@ -22,9 +22,6 @@
         init: function() {
             this.messages = [];
             var socket = this.connect(window.location.hostname, 4000, '/chat');
-            socket.onopen = function() {
-                socket.send('Testing');
-            }.bind(this);
             socket.onmessage = function(evt) {
                 var data = evt.data;
                 var object = JSON.parse(data);
@@ -53,7 +50,6 @@
                 from: this.username,
                 type: 'message'
             };
-            this.messages.push(object);
             this.socket.send(JSON.stringify(object));
         }
     });
