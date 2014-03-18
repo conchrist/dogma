@@ -35,21 +35,6 @@ func StartServer() {
 	options.MaxAge = 86400 //1 day
 	store.Options(*options)
 
-	m.Get("/", func(rw http.ResponseWriter, req *http.Request) {
-		http.Redirect(rw, req, "/login", http.StatusMovedPermanently)
-	})
-
-	m.Get("/login", func(r render.Render, s sessions.Session) {
-		UserID := s.Get("UserID")
-		Username := s.Get("Username")
-		if UserID != nil {
-			r.JSON(200, map[string]interface{}{"_id": UserID, "name": Username})
-			return
-		}
-		r.HTML(200, "login", nil)
-		return
-	})
-
 	m.Post("/login", binding.Form(User{}), func(user User, db *mgo.Database, r render.Render, s sessions.Session) {
 		if len(user.Username) > 0 && len(user.Password) > 0 {
 			UserID, err := authenticateUser(user.Username, user.Password, db)
@@ -60,21 +45,15 @@ func StartServer() {
 			s.Set("UserID", UserID)
 			s.Set("Username", user.Username)
 			r.JSON(200, map[string]interface{}{"_id": UserID, "name": user.Username})
-			return
 		} else {
 			r.JSON(401, map[string]interface{}{"error": "Unauthorized"})
-			return
 		}
 	})
 
-	m.Get("/logout", func(s sessions.Session, r render.Render) string {
+	m.Post("/logout", func(s sessions.Session, r render.Render) string {
 		s.Delete("UserID")
 		r.JSON(200, map[string]interface{}{"status": "logged out"})
 		return ""
-	})
-
-	m.Get("/users/new", func(r render.Render) {
-		r.HTML(200, "new", nil)
 	})
 
 	m.Post("/users", binding.Form(User{}), func(user User, r render.Render, db *mgo.Database, s sessions.Session) {
@@ -91,7 +70,6 @@ func StartServer() {
 			}
 			s.Set("userId", UserID)
 			r.JSON(200, map[string]interface{}{"status": "user added"})
-			return
 		}
 	})
 
