@@ -29,3 +29,4 @@ main
 client/public/js
 SocketServer/ssl
 GoWebSocket
+bower_components
