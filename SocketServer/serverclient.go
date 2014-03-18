@@ -10,13 +10,15 @@ const channelSize = 1000
 
 //holds all the info an client needs.
 type Client struct {
-	ws     *websocket.Conn
-	server *Server
-	send   chan *MessageStruct
-	done   chan bool
+	ws       *websocket.Conn
+	server   *Server
+	send     chan *MessageStruct
+	done     chan bool
+	username string
+	userid   string
 }
 
-func NewClient(ws *websocket.Conn, server *Server) *Client {
+func NewClient(ws *websocket.Conn, server *Server, username, userid string) *Client {
 
 	if ws == nil {
 		log.Fatal("No connection")
@@ -31,7 +33,7 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 	done := make(chan bool)
 
 	//returns new struct.
-	return &Client{ws, server, send, done}
+	return &Client{ws, server, send, done, username, userid}
 }
 
 //getter for client connection
@@ -86,6 +88,19 @@ func (c *Client) ListenToAll() {
 			log.Println("Incoming message: " + message.Message + " from ip " + c.getIP())
 			c.server.BroadCast() <- &message
 			break
+		case "contact_list":
+			contacts := c.server.GetContacts()
+			usernames := make([]string, len(contacts))
+			i := 0
+			for contact, _ := range contacts {
+				usernames[i] = contact.username
+				i++
+			}
+			contactsMessage := &ContactMessage{
+				Contacts: usernames,
+				Type:     "contacts",
+			}
+			websocket.JSON.Send(c.ws, &contactsMessage)
 		//client requested a username
 		case "user":
 			ip := c.getIP()

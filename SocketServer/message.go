@@ -12,6 +12,11 @@ type MessageStruct struct {
 	Time    int    `json:"time"`
 }
 
+type ContactMessage struct {
+	Contacts []string `json:"contacts"`
+	Type     string   `json:"type"`
+}
+
 //middleware
 func mongoDB(adress, db string) martini.Handler {
 	session, err := mgo.Dial(adress)

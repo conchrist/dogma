@@ -102,9 +102,14 @@ func StartServer() {
 
 	server := NewServer()
 	go server.Listen()
-	m.Get("/chat", RequireLogin, func(res http.ResponseWriter, req *http.Request) {
-		handler := server.onConnectHandler()
-		handler.ServeHTTP(res, req)
+	m.Get("/chat", RequireLogin, func(res http.ResponseWriter, req *http.Request, s sessions.Session) {
+		username, userid := s.Get("Username"), s.Get("UserID")
+		if username, ok := username.(string); ok {
+			if userid, ok := userid.(string); ok {
+				handler := server.onConnectHandler(username, userid)
+				handler.ServeHTTP(res, req)
+			}
+		}
 	})
 
 	//---------------------------------------------------------------

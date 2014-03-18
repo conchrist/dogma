@@ -49,10 +49,14 @@ func (s *Server) Messages() []*MessageStruct {
 	return msgs
 }
 
-func (s *Server) onConnectHandler() websocket.Handler {
+func (s *Server) GetContacts() map[*Client]bool {
+	return s.clients
+}
+
+func (s *Server) onConnectHandler(username, userid string) websocket.Handler {
 	return websocket.Handler(func(ws *websocket.Conn) {
 		defer ws.Close()
-		client := NewClient(ws, s)
+		client := NewClient(ws, s, username, userid)
 		s.addClient <- client
 		client.Listen()
 	})
