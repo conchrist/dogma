@@ -7,8 +7,8 @@ Using http://godoc.org/code.google.com/p/go.net/websocket
 
 #AUTHORS:
 
-- Christopher Lillthors christopher.lillthors@gmail.com @github christopherL91
-- Viktor Kronvall viktor.kronvall@gmail.com @github Considerate
+- Christopher Lillthors christopher.lillthors@gmail.com @github [christopherL91](http://github.com/christopherL91)
+- Viktor Kronvall viktor.kronvall@gmail.com @github [considerate](http://github.com/considerate)
 
 
 ##LICENSE
