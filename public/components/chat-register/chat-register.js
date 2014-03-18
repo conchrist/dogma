@@ -22,7 +22,7 @@ Polymer('chat-register', {
     },
     handleRegister: function(event) {
         var user = event.detail.response;
-        this.fireAsync('register', {
+        this.asyncFire('register', {
             _id: user._id,
             name: user.name
         })

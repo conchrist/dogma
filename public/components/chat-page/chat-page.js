@@ -14,6 +14,9 @@ Polymer('chat-page', {
         this.$.login.hidden = true;
         this.$.register.hidden = false;
     },
+    registered: function(event, data) {
+        this.handleLogin(event, data);
+    },
     registrationAborted: function(event) {
         this.$.login.hidden = false;
         this.$.register.hidden = true;
