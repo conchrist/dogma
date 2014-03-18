@@ -7,7 +7,6 @@ import (
 )
 
 type Server struct {
-	pathToServer string
 	clients      map[*Client]bool
 	addClient    chan *Client
 	removeClient chan *Client
@@ -17,9 +16,8 @@ type Server struct {
 	dbUsers      *mgo.Collection
 }
 
-func NewServer(path string) *Server {
+func NewServer() *Server {
 	server := Server{
-		pathToServer: path,
 		clients:      make(map[*Client]bool),
 		addClient:    make(chan *Client),
 		removeClient: make(chan *Client),

@@ -39,18 +39,18 @@ func StartServer() {
 		http.Redirect(rw, req, "/login", http.StatusMovedPermanently)
 	})
 
-	m.Get("/login", func(r render.Render, s sessions.Session) string {
+	m.Get("/login", func(r render.Render, s sessions.Session) {
 		UserID := s.Get("UserID")
 		Username := s.Get("Username")
 		if UserID != nil {
 			r.JSON(200, map[string]interface{}{"_id": UserID, "name": Username})
-			return ""
+			return
 		}
 		r.HTML(200, "login", nil)
-		return ""
+		return
 	})
 
-	m.Post("/login", binding.Form(User{}), func(user User, db *mgo.Database, r render.Render, s sessions.Session) (int, string) {
+	m.Post("/login", binding.Form(User{}), func(user User, db *mgo.Database, r render.Render, s sessions.Session) {
 		if len(user.Username) > 0 && len(user.Password) > 0 {
 			UserID, err := authenticateUser(user.Username, user.Password, db)
 			if err != nil {
@@ -59,12 +59,11 @@ func StartServer() {
 			s.Set("UserID", UserID)
 			s.Set("Username", user.Username)
 			r.JSON(200, map[string]interface{}{"_id": UserID, "name": user.Username})
-			return 200, ""
+			return
 		} else {
 			r.JSON(401, map[string]interface{}{"error": "Unauthorized"})
-			return 401, ""
+			return
 		}
-		return 500, "Internal server error"
 	})
 
 	m.Get("/logout", func(s sessions.Session, r render.Render) string {
@@ -73,27 +72,26 @@ func StartServer() {
 		return ""
 	})
 
-	m.Get("/newuser", func(r render.Render) {
+	m.Get("/users/new", func(r render.Render) {
 		r.HTML(200, "new", nil)
 	})
 
-	m.Post("/newuser", binding.Form(User{}), func(user User, r render.Render, db *mgo.Database, s sessions.Session) (int, string) {
+	m.Post("/users", binding.Form(User{}), func(user User, r render.Render, db *mgo.Database, s sessions.Session) {
 		if len(user.Username) > 0 && len(user.Password) > 0 {
 			passwordHash, err := hashPass(user.Password)
 			if err != nil {
 				r.JSON(401, map[string]interface{}{"error": err.Error()})
-				return 401, ""
+				return
 			}
 			UserID, err := addUser(user.Username, passwordHash, db)
 			if err != nil {
 				r.JSON(401, map[string]interface{}{"error": err.Error()})
-				return 401, ""
+				return
 			}
 			s.Set("userId", UserID)
 			r.JSON(200, map[string]interface{}{"status": "user added"})
 			return 200, ""
 		}
-		return 500, "Internal server error"
 	})
 
 	m.NotFound(func(rw http.ResponseWriter) {
@@ -122,18 +120,15 @@ func StartServer() {
 	})
 	//---------------------------------------------------------------
 	// Secured routes
-	m.Get("/chat", RequireLogin, func(r render.Render, req *http.Request) {
-		r.HTML(200, "chat", nil)
-	})
 
-	//---------------------------------------------------------------
-
-	server := NewServer("/chatroom")
+	server := NewServer()
 	go server.Listen()
-	m.Get("/chatroom", RequireLogin, func(res http.ResponseWriter, req *http.Request) {
+	m.Get("/chat", RequireLogin, func(res http.ResponseWriter, req *http.Request) {
 		handler := server.onConnectHandler()
 		handler.ServeHTTP(res, req)
 	})
+
+	//---------------------------------------------------------------
 
 	log.Fatal(http.ListenAndServeTLS(":4000", "SocketServer/ssl/server.crt", "SocketServer/ssl/server.key", m))
 }
