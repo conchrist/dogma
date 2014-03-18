@@ -1,0 +1,28 @@
+
+<link rel="import" href="../../../bower/polymer-ajax/polymer-ajax.html">
+<polymer-element name="chat-login">
+	<template>
+	<link href="chat-login.css" rel="stylesheet">
+	<div class="jumbotron">
+  		<h1>Login</h1>
+  		<p>Login to chat</p>
+  	</div>
+
+
+    <form id="loginForm" action="/login" method="POST">
+      <input type="text" name="username" id="username"
+      placeholder="username" required autocomplete="off"class="form-control" />
+      <input type="password" name="password" id="password"
+      placeholder="password" required autocomplete="off"class="form-control"
+      id="form" pattern="[a-zA-Z0-9]{0,10}" />
+      <div class="row">
+      <a href="/newuser" id="button" class="col-md-4 btn btn-default btn-info btn-lg"><span class="glyphicon glyphicon-user"></span> New user</a>
+	      <input type="submit"
+	      class="col-md-8 btn btn-default btn-success btn-lg"
+	      value="Login" id="button">
+
+      </div>
+    </form>
+	</template>
+	<script type="text/javascript" src="chat-login.js"></script>
+</polymer-element>
