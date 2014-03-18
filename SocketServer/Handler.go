@@ -24,7 +24,7 @@ func StartServer() {
 
 	m.Use(sessions.Sessions("login-session", store))
 	m.Use(mongoDB("localhost", "Golang"))
-	//used to display html
+	//used to render html or json
 	m.Use(render.Renderer(render.Options{
 		Directory: "public/templates",
 	}))
@@ -40,9 +40,10 @@ func StartServer() {
 	})
 
 	m.Get("/login", func(r render.Render, s sessions.Session) string {
-		UserID := s.Get("userId")
+		UserID := s.Get("UserID")
+		Username := s.Get("Username")
 		if UserID != nil {
-			r.JSON(200, map[string]interface{}{"_id": UserID})
+			r.JSON(200, map[string]interface{}{"_id": UserID, "name": Username})
 			return ""
 		}
 		r.HTML(200, "login", nil)
@@ -55,8 +56,9 @@ func StartServer() {
 			if err != nil {
 				return 401, err.Error()
 			}
-			s.Set("userId", UserID)
-			r.JSON(200, map[string]interface{}{"_id": UserID})
+			s.Set("UserID", UserID)
+			s.Set("Username", user.Username)
+			r.JSON(200, map[string]interface{}{"_id": UserID, "name": user.Username})
 			return 200, ""
 		} else {
 			r.JSON(401, map[string]interface{}{"error": "Unauthorized"})
@@ -66,7 +68,7 @@ func StartServer() {
 	})
 
 	m.Get("/logout", func(s sessions.Session, r render.Render) string {
-		s.Delete("userId")
+		s.Delete("UserID")
 		r.JSON(200, map[string]interface{}{"status": "logged out"})
 		return ""
 	})
@@ -118,9 +120,7 @@ func StartServer() {
 		rw.Write(markdown)
 	})
 	//---------------------------------------------------------------
-	// //Secured routes
-	// m.Use(RequireLogin())
-
+	// Secured routes
 	m.Get("/chat", RequireLogin, func(r render.Render, req *http.Request) {
 		r.HTML(200, "chat", nil)
 	})

@@ -1,0 +1,17 @@
+.username {
+	background: lightgrey;
+	font-weight: bold;
+	padding: 3px;
+	border-radius: 3px;
+}
+
+#messages {
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+article {
+	padding-left: 1em;
+	padding-right: 1em;
+}
