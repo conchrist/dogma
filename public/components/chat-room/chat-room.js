@@ -21,7 +21,7 @@
         },
         init: function() {
             this.messages = [];
-            var socket = this.connect('localhost', 4000, '/chatroom');
+            var socket = this.connect(window.location.hostname, 4000, '/chat');
             socket.onopen = function() {
                 socket.send('Testing');
             }.bind(this);

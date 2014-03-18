@@ -9,16 +9,16 @@
     <article>
       <form id="loginForm" action="/login" method="POST">
         <input type="text" name="username" id="username"
-        placeholder="username" required autocomplete="off"class="form-control" />
+        placeholder="Username" required autocomplete="off" class="form-control" />
         <input type="password" name="password" id="password"
-        placeholder="password" required autocomplete="off"class="form-control"
-        id="form" pattern="[a-zA-Z0-9]{0,10}" />
-        <button type="button" id="button" on-click="{{register}}" class="col-md-4 btn btn-default btn-info btn-lg">
+        placeholder="Password" required autocomplete="off" class="form-control"
+        pattern="[a-zA-Z0-9]{0,10}" />
+        <button type="button" on-click="{{register}}" class="button col-md-4 btn btn-default btn-info btn-lg">
           <span class="glyphicon glyphicon-user"></span> New user
         </button>
 	      <input type="submit"
-	      class="col-md-8 btn btn-default btn-success btn-lg"
-	      value="Login" id="button">
+	      class="button col-md-8 btn btn-default btn-success btn-lg"
+	      value="Login">
       </form>
     </article>
 	</template>
