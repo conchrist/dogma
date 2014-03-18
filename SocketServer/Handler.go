@@ -56,7 +56,7 @@ func StartServer() {
 			}
 			s.Set("userId", ID)
 		} else {
-			r.HTML(200, "login", nil)
+			r.JSON(401, map[string]interface{}{"error": "Unauthorized"})
 			return 401, ""
 		}
 		return 200, "logged in"
