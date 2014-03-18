@@ -9,3 +9,7 @@ Using http://godoc.org/code.google.com/p/go.net/websocket
 
 - Christopher Lillthors christopher.lillthors@gmail.com @github christopherL91
 - Viktor Kronvall @github Considerate
+
+
+##LICENSE
+[MIT License](./public/markdown/license.md)
