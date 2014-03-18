@@ -32,37 +32,32 @@ func validatePass(pass, hash string) bool {
 	return true
 }
 
-func authUser(username, password, choice string, db *mgo.Database) (string, error) {
+func addUser(username, hashedPassword string, db *mgo.Database) (string, error) {
 	collection := db.C("Users")
-
-	switch choice {
-	case "add":
-		user := new(User)
-		user.UserID = bson.NewObjectId()
-		user.Username = username
-		user.Password = password
-		if err := collection.Insert(user); err != nil {
-			return "", errors.New("could not insert user:" + err.Error())
-		}
-		return user.UserID.Hex(), nil
-	case "check":
-		user := new(User)
-		err := collection.Find(bson.M{"username": username}).One(user)
-		if err != nil {
-			//could not find user
-			return "", errors.New("Could not find user")
-		}
-		//the password did not match
-		if !validatePass(password, user.Password) {
-			return "", errors.New("Could not find user")
-		}
-		return user.UserID.Hex(), nil
+	user := new(User)
+	user.UserID = bson.NewObjectId()
+	user.Username = username
+	user.Password = hashedPassword
+	if err := collection.Insert(user); err != nil {
+		return "", errors.New("could not insert user:" + err.Error())
 	}
-	return "", errors.New("Unhandled case")
+	return user.UserID.Hex(), nil
 }
 
-//rw http.ResponseWriter, req *http.Request, db *mgo.Database, s sessions.Session, r render.Render
-//middleware!
+func authenticateUser(username, password string, db *mgo.Database) (string, error) {
+	collection := db.C("Users")
+	user := new(User)
+	err := collection.Find(bson.M{"username": username}).One(user)
+	if err != nil {
+		//could not find user
+		return "", errors.New("Could not find user")
+	}
+	//the password did not match
+	if !validatePass(password, user.Password) {
+		return "", errors.New("Could not find user")
+	}
+	return user.UserID.Hex(), nil
+}
 
 func RequireLogin(s sessions.Session, rw http.ResponseWriter,
 	req *http.Request) {
@@ -70,16 +65,3 @@ func RequireLogin(s sessions.Session, rw http.ResponseWriter,
 		http.Redirect(rw, req, "/login", http.StatusTemporaryRedirect)
 	}
 }
-
-// func RequireLogin() martini.Handler {
-// 	return func(s sessions.Session, context martini.Context, rw http.ResponseWriter, req *http.Request) {
-// 		log.Println("Hello there")
-// 		id := s.Get("userId")
-// 		log.Println(id)
-
-// 		if id == nil {
-// 			//http.Redirect(rw, req, "/login", http.StatusFound)
-// 			http.Error(rw, "Unauthorized", http.StatusUnauthorized)
-// 		}
-// 	}
-// }

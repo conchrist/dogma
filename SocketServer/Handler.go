@@ -40,9 +40,10 @@ func StartServer() {
 	})
 
 	m.Get("/login", func(r render.Render, s sessions.Session) string {
-		v := s.Get("userId")
-		if v != nil {
-			return "already logged in"
+		UserID := s.Get("userId")
+		if UserID != nil {
+			r.JSON(200, map[string]interface{}{"_id": UserID})
+			return ""
 		}
 		r.HTML(200, "login", nil)
 		return ""
@@ -50,21 +51,24 @@ func StartServer() {
 
 	m.Post("/login", binding.Form(User{}), func(user User, db *mgo.Database, r render.Render, s sessions.Session) (int, string) {
 		if len(user.Username) > 0 && len(user.Password) > 0 {
-			ID, err := authUser(user.Username, user.Password, "check", db)
+			UserID, err := authenticateUser(user.Username, user.Password, db)
 			if err != nil {
 				return 401, err.Error()
 			}
-			s.Set("userId", ID)
+			s.Set("userId", UserID)
+			r.JSON(200, map[string]interface{}{"_id": UserID})
+			return 200, ""
 		} else {
 			r.JSON(401, map[string]interface{}{"error": "Unauthorized"})
 			return 401, ""
 		}
-		return 200, "logged in"
+		return 500, "Internal server error"
 	})
 
-	m.Get("/logout", func(s sessions.Session) string {
+	m.Get("/logout", func(s sessions.Session, r render.Render) string {
 		s.Delete("userId")
-		return "logged out"
+		r.JSON(200, map[string]interface{}{"status": "logged out"})
+		return ""
 	})
 
 	m.Get("/newuser", func(r render.Render) {
@@ -73,21 +77,20 @@ func StartServer() {
 
 	m.Post("/newuser", binding.Form(User{}), func(user User, r render.Render, db *mgo.Database, s sessions.Session) (int, string) {
 		if len(user.Username) > 0 && len(user.Password) > 0 {
-			hashedPass, err := hashPass(user.Password)
+			passwordHash, err := hashPass(user.Password)
 			if err != nil {
-				return 401, err.Error()
+				r.JSON(401, map[string]interface{}{"error": err.Error()})
+				return 401, ""
 			}
-			ID, err := authUser(user.Username, hashedPass, "add", db)
+			UserID, err := addUser(user.Username, passwordHash, db)
 			if err != nil {
-				return 401, err.Error()
+				r.JSON(401, map[string]interface{}{"error": err.Error()})
+				return 401, ""
 			}
-			log.Println(ID)
-			s.Set("userId", ID)
-		} else {
-			r.HTML(200, "new", nil)
-			return 401, ""
+			s.Set("userId", UserID)
+			r.JSON(200, map[string]interface{}{"status": "user added"})
 		}
-		return 200, "Successfully addded new user"
+		return 500, "Internal server error"
 	})
 
 	m.NotFound(func(rw http.ResponseWriter) {
