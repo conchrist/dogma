@@ -52,6 +52,7 @@ func StartServer() {
 
 	m.Post("/logout", func(s sessions.Session, r render.Render) string {
 		s.Delete("UserID")
+		s.Delete("Username")
 		r.JSON(200, map[string]interface{}{"status": "logged out"})
 		return ""
 	})
@@ -68,7 +69,8 @@ func StartServer() {
 				r.JSON(401, map[string]interface{}{"error": err.Error()})
 				return
 			}
-			s.Set("userId", UserID)
+			s.Set("UserID", UserID)
+			s.Set("Username", user.Username)
 			r.JSON(200, map[string]interface{}{"status": "user added"})
 		}
 	})
