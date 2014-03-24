@@ -2,7 +2,6 @@ package SocketServer
 
 import (
 	"code.google.com/p/go.net/websocket"
-	"labix.org/v2/mgo"
 	"log"
 )
 
@@ -12,8 +11,6 @@ type Server struct {
 	removeClient chan *Client
 	sendAll      chan *MessageStruct
 	messages     []*MessageStruct
-	dbMessages   *mgo.Collection
-	dbUsers      *mgo.Collection
 }
 
 func NewServer() *Server {
@@ -29,17 +26,17 @@ func NewServer() *Server {
 
 //channel to add a client to the chat.
 func (s *Server) AddClient() chan<- *Client {
-	return (chan<- *Client)(s.addClient)
+	return (s.addClient)
 }
 
 //channel to remove a client from the chat.
 func (s *Server) RemoveClient() chan<- *Client {
-	return (chan<- *Client)(s.removeClient)
+	return (s.removeClient)
 }
 
 //channel to broadcast the messages to all clients.
 func (s *Server) BroadCast() chan<- *MessageStruct {
-	return (chan<- *MessageStruct)(s.sendAll)
+	return (s.sendAll)
 }
 
 //holds all the messages from clients.
@@ -69,7 +66,7 @@ func (s *Server) Listen() {
 		select {
 		//new client connecting
 		case newclient := <-s.addClient:
-			ip := newclient.getIP()
+			ip := newclient.IP()
 			log.Println("New client with ip " + ip + " added")
 			s.clients[newclient] = true
 
@@ -81,9 +78,9 @@ func (s *Server) Listen() {
 		//client disconnected.
 		case removeClient := <-s.removeClient:
 			delete(s.clients, removeClient)
-			log.Println("Client with ip " + removeClient.getIP() + " disconnected")
+			log.Println("Client with ip " + removeClient.IP() + " disconnected")
 
-		//new message came in, distribute to all clients and db.
+		//new message came in, distribute to all clients.
 		case message := <-s.sendAll:
 			s.messages = append(s.messages, message)
 			for client, _ := range s.clients {

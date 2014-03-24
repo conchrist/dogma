@@ -41,13 +41,13 @@ func (c *Client) Conn() *websocket.Conn {
 	return c.ws
 }
 
-func (c *Client) getIP() string {
+func (c *Client) IP() string {
 	return c.Conn().Request().RemoteAddr
 }
 
 //get write channel.
 func (c *Client) Write() chan<- *MessageStruct {
-	return (chan<- *MessageStruct)(c.send)
+	return c.send
 }
 
 func (c *Client) Listen() {
@@ -57,7 +57,7 @@ func (c *Client) Listen() {
 
 //return done channel.
 func (c *Client) Done() chan<- bool {
-	return (chan<- bool)(c.done)
+	return c.done
 }
 
 func (c *Client) sendLoop() {
@@ -85,7 +85,7 @@ func (c *Client) ListenToAll() {
 		//what message is coming?
 		switch message.Type {
 		case "message":
-			log.Println("Incoming message: " + message.Message + " from ip " + c.getIP())
+			log.Println("Incoming message: " + message.Message + " from ip " + c.IP())
 			c.server.BroadCast() <- &message
 			break
 		case "contact_list":
@@ -96,20 +96,23 @@ func (c *Client) ListenToAll() {
 				usernames[i] = contact.username
 				i++
 			}
+			//struct containing all contacts.
 			contactsMessage := &ContactMessage{
 				Contacts: usernames,
 				Type:     "contacts",
 			}
+			//send contact list to client
 			websocket.JSON.Send(c.ws, &contactsMessage)
 		//client requested a username
 		case "user":
-			ip := c.getIP()
+			ip := c.IP()
 			userMessage := &MessageStruct{
 				From:    ip,
 				Message: ip,
 				Type:    "user",
 				Time:    message.Time,
 			}
+			//send to yourself!
 			c.Write() <- userMessage
 			break
 		}

@@ -3,7 +3,6 @@ package SocketServer
 import (
 	"code.google.com/p/go.crypto/bcrypt"
 	"errors"
-	"fmt"
 	"github.com/codegangsta/martini-contrib/sessions"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -63,7 +62,6 @@ func authenticateUser(username, password string, db *mgo.Database) (string, erro
 func RequireLogin(s sessions.Session, rw http.ResponseWriter,
 	req *http.Request) {
 	if s.Get("UserID") == nil {
-		fmt.Println("redirect")
 		http.Redirect(rw, req, "/", http.StatusTemporaryRedirect)
 	}
 }
