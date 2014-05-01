@@ -12,11 +12,17 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+)
+
+const (
+	port = 4000
 )
 
 func StartServer() {
 
 	m := martini.Classic()
+	log.Println("New server started on port " + strconv.Itoa(port))
 	store := sessions.NewCookieStore([]byte("mySuperSecretPassword1234"))
 	m.Use(martini.Static("bower_components", martini.StaticOptions{
 		Prefix: "bower",
@@ -104,6 +110,7 @@ func StartServer() {
 
 	server := NewServer()
 	go server.Listen()
+	//Only for websocket connection.
 	m.Get("/chat", RequireLogin, func(res http.ResponseWriter, req *http.Request, s sessions.Session) {
 		username, userid := s.Get("Username"), s.Get("UserID")
 		if username, ok := username.(string); ok {
@@ -116,5 +123,9 @@ func StartServer() {
 
 	//---------------------------------------------------------------
 
-	log.Fatal(http.ListenAndServeTLS(":4000", "SocketServer/ssl/server.crt", "SocketServer/ssl/server.key", m))
+	log.Fatal(http.ListenAndServeTLS(":"+strconv.Itoa(port),
+		"/Users/christopher/Documents/Programmering/Go/libs/src/github.com/christopherL91/GoWebSocket/SocketServer/ssl/server.crt",
+
+		"/Users/christopher/Documents/Programmering/Go/libs/src/github.com/christopherL91/GoWebSocket/SocketServer/ssl/server.key",
+		m))
 }
