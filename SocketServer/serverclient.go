@@ -88,6 +88,7 @@ func (c *Client) ListenToAll() {
 			log.Println("Incoming message: " + message.Message + " from ip " + c.IP())
 			c.server.BroadCast() <- &message
 			break
+		// START OMIT
 		case "contact_list":
 			contacts := c.server.GetContacts()
 			usernames := make([]string, len(contacts))
@@ -104,6 +105,7 @@ func (c *Client) ListenToAll() {
 			//send contact list to client
 			websocket.JSON.Send(c.ws, &contactsMessage)
 		//client requested a username
+		// END OMIT
 		case "user":
 			ip := c.IP()
 			userMessage := &MessageStruct{
