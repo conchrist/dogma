@@ -36,15 +36,15 @@ Vi har inte utgått från en speciell typ av målgrupp, men programvaran är vä
 En person på företaget är nyanställd och har fått i uppgift av sin chef att bekanta sig med det nya interna kommunikationssystemet.
 Personen möts av följande gränssnitt:
 
-.link https://github.com/conchrist/dogma/blob/master/Presentation/1.png Huvudmeny
+.link https://github.com/conchrist/dogma/blob/master/1.png Huvudmeny
 
 För att komma vidare och skapa en ny användare, trycker användaren på knappen med texten "New user" som i sin tur leder till följande vy:
 
-.link https://github.com/conchrist/dogma/blob/master/Presentation/3.png Ny användare
+.link https://github.com/conchrist/dogma/blob/master/3.png Ny användare
 
 Här skriven användaren in ett valt användarnamn och ett lösenord och trycker på knappen "Create user" för att komma vidare till chattsidan.
 
-.link https://github.com/conchrist/dogma/blob/master/Presentation/2.png Chatt
+.link https://github.com/conchrist/dogma/blob/master/2.png Chatt
 (Inte ännu helt implementerat) ... fortsättning ->
 
 * Användarscenarier
@@ -64,12 +64,25 @@ En anställd på företaget behöver prata med sin chef som sitter någonstans i
 * Testplan
 
 Vi behöver lägga ner mer tid på testning och utformandet av gränssnittet. Det finns buggar som vi är mycker väl medvetna om och som vi kommer ha färdiga innan deadline. Det är framförallt storleken och användarupplevelsen i varje vy som vi kommer lägga fokus på, men även att lägga till lite nya features. Som ni såg i ovan presentation av scenarion så har vi kommit långt i själva utvecklandet av det visuella, men det finns alltid små detaljer som man kan rätta till.
+Vi kommer att försöka få människor i vår omgivning att ge feedback angående vår design vilket kommer utveckla vår programvara till det bättre.
 
 .image gopherswrench.jpg 300 300
 
 * Programdesign
 
+.code -numbers SocketServer/Handler.go /START OMIT/,/END OMIT/
+
+* Programdesign
+kodexempel...
+
+* Programdesign
+kodexempel...
+
+* Programdesign
+kodexempel...
+
 * Tekniska frågor
+kodexempel...
 
 * Arbetsplan
 

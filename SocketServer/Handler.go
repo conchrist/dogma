@@ -41,6 +41,7 @@ func StartServer() {
 	options.MaxAge = 86400 //1 day
 	store.Options(*options)
 
+	// START OMIT
 	m.Post("/login", binding.Form(User{}), func(user User, db *mgo.Database, r render.Render, s sessions.Session) {
 		if len(user.Username) > 0 && len(user.Password) > 0 {
 			UserID, err := authenticateUser(user.Username, user.Password, db)
@@ -55,6 +56,7 @@ func StartServer() {
 			r.JSON(401, map[string]interface{}{"error": "Unauthorized"})
 		}
 	})
+	// END OMIT
 
 	m.Post("/logout", func(s sessions.Session, r render.Render) string {
 		s.Delete("UserID")
