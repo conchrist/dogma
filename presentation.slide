@@ -69,11 +69,16 @@ Vi kommer att försöka få människor i vår omgivning att ge feedback angåend
 .image gopherswrench.jpg 300 300
 
 * Programdesign
+Inloggnings-proceduren
 
-.code -numbers SocketServer/Handler.go /START OMIT/,/END OMIT/
+.code SocketServer/Handler.go /START OMIT/,/END OMIT/
 
 * Programdesign
-kodexempel...
+Detta har ännu inte implementerats.
+
+Användarna ska kunna se vilka användare som för närvarande är online.
+
+.code SocketServer/serverclient.go /START OMIT/,/END OMIT/
 
 * Programdesign
 kodexempel...
@@ -82,7 +87,8 @@ kodexempel...
 kodexempel...
 
 * Tekniska frågor
-kodexempel...
+
+- Implementera en lista över inloggade användare
 
 * Arbetsplan
 
@@ -93,3 +99,6 @@ Detta kompilerar på ungefär 6 sec på min Macbook Pro (helt från scratch)
 .play GoWebSocket.go
 
 .image frontpage.png
+
+* Sammanfattning
+TODO
