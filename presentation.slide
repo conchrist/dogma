@@ -74,9 +74,9 @@ Inloggnings-proceduren
 .code SocketServer/Handler.go /START OMIT/,/END OMIT/
 
 * Programdesign
-Detta har ännu inte implementerats.
-
 Användarna ska kunna se vilka användare som för närvarande är online.
+
+Denna lista visas ännu inte i det grafiska interfacet.
 
 .code SocketServer/serverclient.go /START OMIT/,/END OMIT/
 
