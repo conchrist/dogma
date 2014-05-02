@@ -100,13 +100,13 @@ Klienten kopplar upp sig mot servern med WebSockets och skickar meddelanden som 
 	en speciellt JSON-meddelande för att få del av listan.
 
 -   Q: Fråga Foo
-	A: svar Bar
+	A: Bar
 
 -   Q: Fråga Foo
-	A: svar Bar
+	A: Bar
 
 -   Q: Fråga Foo
-	A: svar Bar
+	A: Bar
 
 * Smakprov
 
