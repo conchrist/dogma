@@ -109,11 +109,12 @@ Klienten kopplar upp sig mot servern med WebSockets och skickar meddelanden som 
 
 * Smakprov
 
-Detta kompilerar på ungefär 6 sec på min Macbook Pro (helt från scratch)
+Låt oss detta i produktion. Be till demo-gudarna!
 
 .play GoWebSocket.go
+
+.link https://130.229.132.75:4000 klient
 
 .image frontpage.png
 
 * Sammanfattning
-TODO
