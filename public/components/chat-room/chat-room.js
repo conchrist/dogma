@@ -4,6 +4,7 @@
         userid: null,
         username: null,
         messages: [],
+        //START OMIT
         connect: function(host, port, path) {
             if (Array.isArray(path)) {
                 path = pathArray.join('/');
@@ -11,10 +12,10 @@
             if (path[0] === '/') {
                 path = path.slice(1, path.length);
             }
-            console.log('wss://' + host + ':' + port + '/' + path);
             var ws = new WebSocket('wss://' + host + ':' + port + '/' + path);
             return ws;
         },
+        //END OMIT
         formSubmit: function(event) {
             event.preventDefault();
             this.handleText();
@@ -53,6 +54,7 @@
             this.sendMessage(text);
             this.$.textField.value = '';
         },
+        //START SEND OMIT
         sendMessage: function(message) {
             var object = {
                 body: message,
@@ -62,5 +64,6 @@
             };
             this.socket.send(JSON.stringify(object));
         }
+        //END SEND OMIT
     });
 }(this, document));

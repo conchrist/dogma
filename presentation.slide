@@ -81,10 +81,15 @@ Användarna ska kunna se vilka användare som för närvarande är online.
 .code SocketServer/serverclient.go /START OMIT/,/END OMIT/
 
 * Programdesign
-kodexempel...
+Front-end koden är modulariserad med Web Components och Polymer.
+
+.code public/components/chat-room/chat-room.html
 
 * Programdesign
-kodexempel...
+Klienten kopplar upp sig mot servern med WebSockets och skickar meddelanden som JSON.
+
+.code public/components/chat-room/chat-room.js /START OMIT/,/END OMIT/
+.code public/components/chat-room/chat-room.js /START SEND OMIT/,/END SEND OMIT/
 
 * Tekniska frågor
 
