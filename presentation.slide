@@ -93,7 +93,20 @@ Klienten kopplar upp sig mot servern med WebSockets och skickar meddelanden som 
 
 * Tekniska frågor
 
-- Implementera en lista över inloggade användare
+-   Q: Hur implementerar vi en lista över alla inloggade användare?
+	A: Se kodimplementation som vi visat tidigare. Clienten måste dock skicka
+	en speciellt JSON - meddelande för att få del av listan.
+
+-   Q: Fråga
+	A: svar
+
+-   Q: Fråga
+	A: svar
+-   Q: Fråga
+	A: svar
+-   Q: Fråga
+	A: svar
+
 
 * Arbetsplan
 
