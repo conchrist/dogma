@@ -1,5 +1,5 @@
 Go Chat
-A chat written in Go and Javascript using Websockets
+A chat written in Go and JavaScript using Websockets
 1 May 2014
 Tags: chat,Go,websocket
 
@@ -22,7 +22,7 @@ Programmet är tänkt att utgöra ett komplett internt chattsystem för ett för
 
 I programvaran skapar man användare via ett enkelt gränssnitt, och när man väl är inloggad kommer man till en vy där det finns möjlighet att skriva textmeddelanden till alla som är inloggade. Alla meddelanden som hittils har skrivits sparas in i ovan nämnd databas.
 
-Programvaran består av två delar. Dels en server som är helt skriven i Go, och dels en client som är skriven i HTML/Javascipt tillsammans med ramverket polymer.
+Programvaran består av två delar. Dels en server som är helt skriven i Go, och dels en client som är skriven i HTML/JavaScript tillsammans med ramverket polymer.
 Klienten är dessutom helt mobilanpassad och är således responsiv.
 
 .image frontpage.png
