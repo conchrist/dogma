@@ -1,0 +1,23 @@
+<link rel="import" href="../../../bower/polymer-ajax/polymer-ajax.html">
+<polymer-element name="chat-register" attributes="username password">
+	<template>
+		<link href="chat-register.css" rel="stylesheet">
+		<div class="jumbotron">
+	  		<h1>Register</h1>
+	  		<p>Fill in information</p>
+	  	</div>
+	  	<article>
+		    <form id="registerForm" action="/users" method="POST" on-submit="{{createUser}}">
+		      <input type="text" id="username" placeholder="Username " value="{{username}}"
+		      autocomplete="off" class="form-control"/>
+		      <input type="password" id="password" placeholder="Password " value="{{password}}"
+		      autocomplete="off" class="form-control"/>
+		      <button type="button" on-click="{{goBack}}" class="button btn btn-default btn-danger btn-lg">
+		      	<span class="glyphicon glyphicon-remove"></span> Back
+		      </button>
+		      <input type="submit" class="button btn btn-default btn-success btn-lg" value="Create user">
+		    </form>
+	    </article>
+    </template>
+    <script type="text/javascript" src="chat-register.js"></script>
+</polymer-element>

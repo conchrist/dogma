@@ -1,0 +1,20 @@
+<polymer-element name="chat-room" attributes="userid username">
+	<template>
+		<link rel="stylesheet" href="chat-room.css">
+		<div class="jumbotron">
+	  		<h1>Chat room</h1>
+	  	</div>
+	  	<article>
+		  	<form id="sendForm" on-submit="{{formSubmit}}">
+		        <input type="text" id="textField" autocomplete="off"/>
+		        <input type="button" id="sendButton" class="btn btn-success" Value="Send"/>
+		    </form>
+		    <ul id="messages">
+		    	<template repeat="{{message in messages}}">
+		    		<li><span class="username">{{message.from}}</span> {{message.body}}</li>
+		    	</template>
+		    </ul>
+	    </article>
+	</template>
+	<script type="text/javascript" src="chat-room.js"></script>
+</polymer-element>
