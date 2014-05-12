@@ -38,6 +38,8 @@
                     this.messages.push(object);
                 } else if (object.type === 'contacts') {
                     this.contacts = object.contacts;
+                } else if(object.type === 'client joined') {
+                    this.contacts.push(object.body);
                 }
             }.bind(this);
             socket.onerror = function(e) {
@@ -67,6 +69,12 @@
         //END SEND OMIT
         toggleDrawer: function() {
             this.$.drawerpanel.togglePanel();
+            this.socket.send(JSON.stringify({
+                type: 'contact_list',
+                body: '',
+                time: Date.now(),
+                from: this.username
+            }));
         },
         logout: function() {
             this.$.logoutajax.go();

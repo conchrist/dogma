@@ -149,7 +149,11 @@ func StartServer() {
 			log.Println(UserID, user.Username)
 			s.Set("UserID", UserID)
 			s.Set("Username", user.Username)
-			r.JSON(200, map[string]interface{}{"status": "user added"})
+			r.JSON(200, map[string]interface{}{
+				"status": "user added",
+				"_id":    UserID,
+				"name":   user.Username,
+			})
 		}
 	})
 
