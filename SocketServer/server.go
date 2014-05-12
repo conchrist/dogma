@@ -83,11 +83,13 @@ func (s *server) Listen() {
 				newclient.write() <- msg
 			}
 
-			s.BroadCast() <- &messageStruct{
-				From:    "server",
-				Message: newclient.username,
-				Type:    "client joined",
-			}
+			go func() {
+				s.BroadCast() <- &messageStruct{
+					From:    "server",
+					Message: newclient.username,
+					Type:    "client joined",
+				}
+			}()
 
 		//client disconnected.
 		case removeClient := <-s.removeClient:

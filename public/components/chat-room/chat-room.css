@@ -4,11 +4,11 @@
 	background-color: white;
 }
 
-.contactbutton {
+.drawerbutton {
 	display: none;
 }
 
-core-drawer-panel[narrow] .contactbutton {
+core-drawer-panel[narrow] .drawerbutton {
 	display: inline-block;
 	float: right;
 }
