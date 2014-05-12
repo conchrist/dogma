@@ -117,10 +117,14 @@ func StartServer() {
 
 	m.Get("/status", func(s sessions.Session, r render.Render) {
 		userid := s.Get("UserID")
+		username := s.Get("Username")
+		log.Println("SESSION USER", userid, username)
 		if _, ok := userid.(string); ok {
 			r.JSON(200, map[string]interface{}{
 				"status":   "logged in",
 				"loggedIn": true,
+				"_id":      userid,
+				"name":     username,
 			})
 		} else {
 			r.JSON(401, map[string]interface{}{
@@ -142,6 +146,7 @@ func StartServer() {
 				r.JSON(401, map[string]interface{}{"error": err.Error()})
 				return
 			}
+			log.Println(UserID, user.Username)
 			s.Set("UserID", UserID)
 			s.Set("Username", user.Username)
 			r.JSON(200, map[string]interface{}{"status": "user added"})
