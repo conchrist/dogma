@@ -11,11 +11,12 @@ vkr@kth.se
 http://github.com/christopherL91
 http://github.com/considerate
 
-The gopher images are Creative Commons Attributions 3.0 licensed and they are created by Renee French
+The gopher images are Creative Commons Attributions 3.0 licensed and they are created by Renee French.
 
 * Programbeskrivning
 
-- Krav: *MongoDB*
+- Krav:
+	Databas: MongoDB
 
 Programmet är tänkt att utgöra ett komplett internt chattsystem för ett företag.
 
@@ -27,7 +28,7 @@ Klienten är dessutom helt mobilanpassad och är således responsiv.
 .image frontpage.png
 
 * Användarbeskrivning
-Vi har inte utgått från en speciell typ av målgrupp, men programvaran är väldigt enkel och intuitiv att använda sig av. Vi skulle uppskatta att en normalbegåvad datoranvändare utan problem kan använda vår programvara.
+Vi har inte utgått från en speciell typ av målgrupp, men programvaran är väldigt enkel och intuitiv att använda sig av. Vi skulle uppskatta att en normal datoranvändare utan problem kan använda vår programvara.
 
 * Användarscenarier
 
@@ -45,7 +46,8 @@ För att komma vidare och skapa en ny användare, trycker användaren på knappe
 Här skriven användaren in ett valt användarnamn och ett lösenord och trycker på knappen "Create user" för att komma vidare till chattsidan.
 
 .link https://github.com/conchrist/dogma/blob/master/2.png Chatt
-(Inte ännu helt implementerat) ... fortsättning ->
+
+ ... fortsättning ->
 
 * Användarscenarier
 
@@ -66,7 +68,7 @@ En anställd på företaget behöver prata med sin chef som sitter någonstans i
 Vi behöver lägga ner mer tid på testning och utformandet av gränssnittet. Det finns buggar som vi är mycker väl medvetna om och som vi kommer ha färdiga innan deadline. Det är framförallt storleken och användarupplevelsen i varje vy som vi kommer lägga fokus på, men även att lägga till lite nya features. Som ni såg i ovan presentation av scenarion så har vi kommit långt i själva utvecklandet av det visuella, men det finns alltid små detaljer som man kan rätta till.
 Vi kommer att försöka få människor i vår omgivning att ge feedback angående vår design vilket kommer utveckla vår programvara till det bättre.
 
-.image gopherswrench.jpg 300 300
+.image gopherswrench.jpg 300 350
 
 * Programdesign
 Inloggnings-proceduren
@@ -95,26 +97,26 @@ Klienten kopplar upp sig mot servern med WebSockets och skickar meddelanden som 
 
 -   Q: Hur implementerar vi en lista över alla inloggade användare?
 	A: Se kodimplementation som vi visat tidigare. Clienten måste dock skicka
-	en speciellt JSON - meddelande för att få del av listan.
+	en speciellt JSON-meddelande för att få del av listan.
 
--   Q: Fråga
-	A: svar
+-   Q: Fråga Foo
+	A: Bar
 
--   Q: Fråga
-	A: svar
--   Q: Fråga
-	A: svar
--   Q: Fråga
-	A: svar
+-   Q: Fråga Foo
+	A: Bar
+
+-   Q: Fråga Foo
+	A: Bar
 
 * Smakprov
 
-Låt oss detta i produktion. Be till demo-gudarna!
+Låt oss visa detta i produktion. Be till demo-gudarna!
 
 .play GoWebSocket.go
 
-.link https://130.229.132.75:4000 klient
+.link https://considerate.com:4000 klient
 
 .image frontpage.png 140 140
 
 * Sammanfattning
+TODO.
