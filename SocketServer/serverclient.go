@@ -2,7 +2,16 @@ package SocketServer
 
 import (
 	"code.google.com/p/go.net/websocket"
+	"errors"
+	"labix.org/v2/mgo"
 	"log"
+)
+
+var (
+	DBERROR        error = errors.New("Error dialing DB")
+	DBINSERT       error = errors.New("Error inserting value")
+	WEBSOCKETERROR error = errors.New("Client failed to connect")
+	SERVERERROR    error = errors.New("Server not started")
 )
 
 //Holds 1000 messages at once.
@@ -16,14 +25,15 @@ type Client struct {
 	done     chan bool
 	username string
 	userid   string
+	db       *mgo.Database
 }
 
-func NewClient(ws *websocket.Conn, server *Server, username, userid string) *Client {
+func NewClient(ws *websocket.Conn, server *Server, username, userid string, db *mgo.Database) *Client {
 
 	if ws == nil {
-		log.Fatal("No connection")
+		log.Fatal(WEBSOCKETERROR.Error())
 	} else if server == nil {
-		log.Fatal("No server")
+		log.Fatal(SERVERERROR.Error())
 	}
 
 	//channel to send messages over.
@@ -33,7 +43,23 @@ func NewClient(ws *websocket.Conn, server *Server, username, userid string) *Cli
 	done := make(chan bool)
 
 	//returns new struct.
-	return &Client{ws, server, send, done, username, userid}
+	return &Client{
+		ws:       ws,
+		server:   server,
+		send:     send,
+		done:     done,
+		username: username,
+		userid:   userid,
+		db:       db,
+	}
+}
+
+//insert messages into DB.
+func (c *Client) insertMessage(message *MessageStruct) {
+	err := c.db.C("Messages").Insert(message)
+	if err != nil {
+		log.Fatalf("%s %s", DBINSERT.Error(), err.Error())
+	}
 }
 
 //getter for client connection
@@ -86,17 +112,21 @@ func (c *Client) ListenToAll() {
 		switch message.Type {
 		case "message":
 			log.Println("Incoming message: " + message.Message + " from ip " + c.IP())
+			go c.insertMessage(&message)
 			c.server.BroadCast() <- &message
 			break
 		// START OMIT
 		case "contact_list":
 			contacts := c.server.GetContacts()
+
+			c.server.mutex.Lock()
 			usernames := make([]string, len(contacts))
 			i := 0
 			for contact, _ := range contacts {
 				usernames[i] = contact.username
 				i++
 			}
+			c.server.mutex.Unlock()
 			//struct containing all contacts.
 			contactsMessage := &ContactMessage{
 				Contacts: usernames,
