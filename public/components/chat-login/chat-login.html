@@ -1,13 +1,22 @@
-<link rel="import" href="../../../bower/polymer-ajax/polymer-ajax.html">
+<link rel="import" href="../../../bower/core-ajax/core-ajax.html">
+<link rel="import" href="../chat-footer/chat-footer.html">
 <polymer-element name="chat-login">
 	<template>
+    <core-ajax
+      id="loginajax"
+      url="/login"
+      method="POST"
+      handleAs="json"
+      on-core-response="{{handleLogin}}"
+      on-core-error="{{failedToLogin}}"
+    ></core-ajax>
 	  <link href="chat-login.css" rel="stylesheet">
 	  <div class="jumbotron">
   		<h1>Login</h1>
   		<p>Login to chat</p>
   	</div>
     <article>
-      <form id="loginForm" action="/login" method="POST">
+      <form id="loginForm" action="/login" method="POST" on-submit="{{login}}">
         <input type="text" name="username" id="username"
         placeholder="Username" required autocomplete="off" class="form-control" />
         <input type="password" name="password" id="password"
@@ -21,6 +30,7 @@
 	      value="Login">
       </form>
     </article>
+    <chat-footer></chat-footer>
 	</template>
 	<script type="text/javascript" src="chat-login.js"></script>
 </polymer-element>

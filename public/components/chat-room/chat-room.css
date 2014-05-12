@@ -1,3 +1,18 @@
+.contacts {
+	padding: 10px;
+	border-left: 1px solid #ccc;
+	background-color: white;
+}
+
+.contactbutton {
+	display: none;
+}
+
+core-drawer-panel[narrow] .contactbutton {
+	display: inline-block;
+	float: right;
+}
+
 .username {
 	background: lightgrey;
 	font-weight: bold;

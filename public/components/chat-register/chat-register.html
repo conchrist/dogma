@@ -1,6 +1,14 @@
-<link rel="import" href="../../../bower/polymer-ajax/polymer-ajax.html">
+<link rel="import" href="../../../bower/core-ajax/core-ajax.html">
 <polymer-element name="chat-register" attributes="username password">
 	<template>
+		<core-ajax
+			id="registerajax"
+			url="/users"
+			method="POST"
+			handleAs="json"
+			on-core-response="{{handleRegister}}"
+			on-core-error="{{failedToRegister}}"
+		></core-ajax>
 		<link href="chat-register.css" rel="stylesheet">
 		<div class="jumbotron">
 	  		<h1>Register</h1>

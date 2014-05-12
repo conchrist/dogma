@@ -16,8 +16,9 @@
   "dependencies": {
     "bootstrap": "~3.1.1",
     "flat-ui-official": "~2.1.3",
-    "polymer-elements": "polymer/polymer-elements#~0.2.1",
-    "polymer-ui-elements": "polymer/polymer-ui-elements#~0.2.1",
-    "polymer": "polymer/polymer#~0.2.1"
+    "polymer-elements": "polymer/polymer-elements#~0.2.3",
+    "polymer-ui-elements": "polymer/polymer-ui-elements#~0.2.3",
+    "polymer": "polymer/polymer#~0.2.3",
+    "core-elements": "Polymer/core-elements#~0.2.3"
   }
 }

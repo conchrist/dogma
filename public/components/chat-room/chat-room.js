@@ -22,14 +22,14 @@
         },
         init: function() {
             this.messages = [];
-            var socket = this.connect(window.location.hostname, 4000, '/chat');
+            var socket = this.connect(window.location.hostname, window.location.port || 4000, '/chat');
             socket.onopen = function(e) {
                 socket.send(JSON.stringify({
                     type: 'contact_list',
                     body: '',
                     time: Date.now(),
                     from: this.username
-                }))
+                }));
             }.bind(this);
             socket.onmessage = function(e) {
                 var data = e.data;
@@ -37,7 +37,7 @@
                 if (object.type === 'message') {
                     this.messages.push(object);
                 } else if (object.type === 'contacts') {
-                    console.log(object.contacts);
+                    this.contacts = object.contacts;
                 }
             }.bind(this);
             socket.onerror = function(e) {
@@ -63,7 +63,10 @@
                 type: 'message'
             };
             this.socket.send(JSON.stringify(object));
-        }
+        },
         //END SEND OMIT
+        toggleDrawer: function() {
+            this.$.drawerpanel.togglePanel();
+        }
     });
 }(this, document));
