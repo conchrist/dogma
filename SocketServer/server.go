@@ -7,56 +7,56 @@ import (
 	"sync"
 )
 
-type Server struct {
+type server struct {
 	mutex        *sync.Mutex
 	clients      map[*Client]bool
 	addClient    chan *Client
 	removeClient chan *Client
-	sendAll      chan *MessageStruct
-	messages     []*MessageStruct
+	sendAll      chan *messageStruct
+	messages     []*messageStruct
 }
 
-func NewServer(address, name string) *Server {
-	server := Server{
+func NewServer(address, name string) *server {
+	server := &server{
 		mutex:        &sync.Mutex{},
 		clients:      make(map[*Client]bool),
 		addClient:    make(chan *Client),
 		removeClient: make(chan *Client),
-		sendAll:      make(chan *MessageStruct),
-		messages:     make([]*MessageStruct, 0),
+		sendAll:      make(chan *messageStruct),
+		messages:     make([]*messageStruct, 0),
 	}
-	return &server
+	return server
 }
 
 //channel to add a client to the chat.
-func (s *Server) AddClient() chan<- *Client {
+func (s *server) AddClient() chan<- *Client {
 	return (s.addClient)
 }
 
 //channel to remove a client from the chat.
-func (s *Server) RemoveClient() chan<- *Client {
+func (s *server) RemoveClient() chan<- *Client {
 	return (s.removeClient)
 }
 
 //channel to broadcast the messages to all clients.
-func (s *Server) BroadCast() chan<- *MessageStruct {
+func (s *server) BroadCast() chan<- *messageStruct {
 	return (s.sendAll)
 }
 
 //holds all the messages from clients.
-func (s *Server) Messages() []*MessageStruct {
-	msgs := make([]*MessageStruct, len(s.messages))
+func (s *server) Messages() []*messageStruct {
+	msgs := make([]*messageStruct, len(s.messages))
 	copy(msgs, s.messages)
 	return msgs
 }
 
 //return the contact list. (A list of users)
-func (s *Server) GetContacts() map[*Client]bool {
+func (s *server) GetContacts() map[*Client]bool {
 	return s.clients
 }
 
 //a handler to handle a new client connection.
-func (s *Server) onConnectHandler(username, userid string, db *mgo.Database) websocket.Handler {
+func (s *server) onConnectHandler(username, userid string, db *mgo.Database) websocket.Handler {
 	return websocket.Handler(func(ws *websocket.Conn) {
 		defer ws.Close()
 		client := NewClient(ws, s, username, userid, db)
@@ -66,7 +66,7 @@ func (s *Server) onConnectHandler(username, userid string, db *mgo.Database) web
 }
 
 //start server!
-func (s *Server) Listen() {
+func (s *server) Listen() {
 	//listen for messages, clients and so on...
 	for {
 		select {
