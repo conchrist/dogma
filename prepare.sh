@@ -2,6 +2,8 @@
 
 echo "Downloading dependencies"
 
+npm install -g bower
+bower install
 go get -u code.google.com/p/go.net/websocket
 go get -u code.google.com/p/gcfg
 go get -u github.com/codegangsta/martini-contrib/binding
