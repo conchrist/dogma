@@ -3,11 +3,9 @@ Polymer('chat-register', {
     password: '',
     createUser: function(event) {
         event.preventDefault();
-        var ajax = document.createElement('polymer-ajax');
         var form = this.$.registerForm;
-        ajax.url = form.action;
         //Uppercase HTTP method
-        ajax.method = String(form.method).toUpperCase();
+        var ajax = this.$.registerajax;
         var username = this.$.username.value;
         var password = this.$.password.value;
         var params = {
@@ -15,9 +13,6 @@ Polymer('chat-register', {
             password: password
         };
         ajax.params = params;
-        ajax.handleAs = 'json';
-        ajax.addEventListener('polymer-response', this.handleRegister.bind(this));
-        ajax.addEventListener('polymer-error', this.failedToRegister.bind(this));
         ajax.go();
     },
     handleRegister: function(event) {
@@ -25,7 +20,7 @@ Polymer('chat-register', {
         this.asyncFire('register', {
             _id: user._id,
             name: user.name
-        })
+        });
     },
     failedToRegister: function(event) {
         var message = event.detail.response;

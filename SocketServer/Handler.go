@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	port = 4000
+	port = 5000
 )
 
 func StartServer() {
@@ -63,6 +63,21 @@ func StartServer() {
 		s.Delete("Username")
 		r.JSON(200, map[string]interface{}{"status": "logged out"})
 		return ""
+	})
+
+	m.Get("/status", func(s sessions.Session, r render.Render) {
+		userid := s.Get("UserID")
+		if userid, ok := userid.(string); ok {
+			r.JSON(200, map[string]interface{}{
+				"status":   "logged in",
+				"loggedIn": true,
+			})
+		} else {
+			r.JSON(401, map[string]interface{}{
+				"status":   "logged out",
+				"loggedIn": false,
+			})
+		}
 	})
 
 	m.Post("/users", binding.Form(User{}), func(user User, r render.Render, db *mgo.Database, s sessions.Session) {
@@ -124,10 +139,10 @@ func StartServer() {
 	})
 
 	//---------------------------------------------------------------
-
-	log.Fatal(http.ListenAndServeTLS(":"+strconv.Itoa(port),
-		"/Users/christopher/Documents/Programmering/Go/libs/src/github.com/christopherL91/GoWebSocket/SocketServer/ssl/server.crt",
-
-		"/Users/christopher/Documents/Programmering/Go/libs/src/github.com/christopherL91/GoWebSocket/SocketServer/ssl/server.key",
+	bindURL := ":" + strconv.Itoa(port)
+	log.Println(bindURL)
+	log.Fatal(http.ListenAndServeTLS(bindURL,
+		"SocketServer/ssl/server.crt",
+		"SocketServer/ssl/server.key",
 		m))
 }
