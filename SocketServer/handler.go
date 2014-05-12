@@ -117,7 +117,7 @@ func StartServer() {
 
 	m.Get("/status", func(s sessions.Session, r render.Render) {
 		userid := s.Get("UserID")
-		if userid, ok := userid.(string); ok {
+		if _, ok := userid.(string); ok {
 			r.JSON(200, map[string]interface{}{
 				"status":   "logged in",
 				"loggedIn": true,
