@@ -18,17 +18,17 @@ var (
 const channelSize = 1000
 
 //holds all the info an client needs.
-type Client struct {
+type client struct {
 	ws       *websocket.Conn
 	server   *server
 	send     chan *messageStruct
-	done     chan bool
+	_done    chan bool
 	username string
 	userid   string
 	db       *mgo.Database
 }
 
-func NewClient(ws *websocket.Conn, server *server, username, userid string, db *mgo.Database) *Client {
+func NewClient(ws *websocket.Conn, server *server, username, userid string, db *mgo.Database) *client {
 
 	if ws == nil {
 		log.Fatal(WEBSOCKETERROR.Error())
@@ -43,11 +43,11 @@ func NewClient(ws *websocket.Conn, server *server, username, userid string, db *
 	done := make(chan bool)
 
 	//returns new struct.
-	return &Client{
+	return &client{
 		ws:       ws,
 		server:   server,
 		send:     send,
-		done:     done,
+		_done:    done,
 		username: username,
 		userid:   userid,
 		db:       db,
@@ -55,7 +55,7 @@ func NewClient(ws *websocket.Conn, server *server, username, userid string, db *
 }
 
 //insert messages into DB.
-func (c *Client) insertMessage(message *messageStruct) {
+func (c *client) insertMessage(message *messageStruct) {
 	err := c.db.C("Messages").Insert(message)
 	if err != nil {
 		log.Fatalf("%s %s", DBINSERT.Error(), err.Error())
@@ -63,50 +63,50 @@ func (c *Client) insertMessage(message *messageStruct) {
 }
 
 //getter for client connection
-func (c *Client) conn() *websocket.Conn {
+func (c *client) conn() *websocket.Conn {
 	return c.ws
 }
 
-func (c *Client) iP() string {
+func (c *client) iP() string {
 	return c.conn().Request().RemoteAddr
 }
 
 //get write channel.
-func (c *Client) write() chan<- *messageStruct {
+func (c *client) write() chan<- *messageStruct {
 	return c.send
 }
 
 //start client and listen on connections.
-func (c *Client) Listen() {
+func (c *client) Listen() {
 	go c.sendLoop()
-	c.ListenToAll()
+	c.listenToAll()
 }
 
 //return done channel.
-func (c *Client) Done() chan<- bool {
-	return c.done
+func (c *client) done() chan<- bool {
+	return c._done
 }
 
-func (c *Client) sendLoop() {
+func (c *client) sendLoop() {
 	for {
 		select {
 		case message := <-c.send:
 			websocket.JSON.Send(c.ws, message)
 
-		case <-c.done:
+		case <-c._done:
 			c.server.RemoveClient() <- c
-			c.done <- true
+			c._done <- true
 			return
 		}
 	}
 }
 
-func (c *Client) ListenToAll() {
+func (c *client) listenToAll() {
 	for {
 		var message messageStruct
 		err := websocket.JSON.Receive(c.ws, &message)
 		if err != nil {
-			c.done <- true
+			c._done <- true
 			continue
 		}
 		//what message is coming?
@@ -118,7 +118,7 @@ func (c *Client) ListenToAll() {
 			break
 		// START OMIT
 		case "contact_list":
-			contacts := c.server.GetContacts()
+			contacts := c.server.getContacts()
 
 			c.server.mutex.Lock()
 			usernames := make([]string, len(contacts))
