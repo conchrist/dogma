@@ -22,6 +22,7 @@
         },
         init: function() {
             this.messages = [];
+            this.contacts = [];
             var socket = this.connect(window.location.hostname, window.location.port || 4000, '/chat');
             socket.onopen = function(e) {
                 socket.send(JSON.stringify({
@@ -31,16 +32,23 @@
                     from: this.username
                 }));
             }.bind(this);
+            var contacts = {};
             socket.onmessage = function(e) {
                 var data = e.data;
                 var object = JSON.parse(data);
                 if (object.type === 'message') {
                     this.messages.push(object);
                 } else if (object.type === 'contacts') {
-                    this.contacts = object.contacts;
+                    object.contacts.forEach(function(contact) {
+                        contacts[contact] = true;
+                    }, this);
                 } else if(object.type === 'client joined') {
-                    this.contacts.push(object.body);
+                    contacts[object.body] = true;
+                    console.log(this.contacts);
+                } else if (object.type === 'client left') {
+                    delete contacts[object.body];
                 }
+                this.contacts = Object.keys(contacts);
             }.bind(this);
             socket.onerror = function(e) {
                 console.error(e.data);
@@ -80,6 +88,9 @@
             this.$.logoutajax.go();
             this.socket.close();
             this.fire('logout');
+        },
+        contactsChanged: function() {
+            console.log('changed');
         }
     });
 }(this, document));
