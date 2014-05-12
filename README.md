@@ -19,6 +19,7 @@ name = Dogma #Default is Dogma
 How to install:
 ```
 go get -u code.google.com/p/go.net/websocket
+go get -u code.google.com/p/gcfg
 go get -u github.com/codegangsta/martini-contrib/binding
 go get -u github.com/codegangsta/martini-contrib/render
 go get -u github.com/codegangsta/martini-contrib/sessions
