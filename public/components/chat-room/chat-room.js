@@ -67,6 +67,11 @@
         //END SEND OMIT
         toggleDrawer: function() {
             this.$.drawerpanel.togglePanel();
+        },
+        logout: function() {
+            this.$.logoutajax.go();
+            this.socket.close();
+            this.fire('logout');
         }
     });
 }(this, document));

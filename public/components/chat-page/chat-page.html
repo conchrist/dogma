@@ -2,8 +2,16 @@
 <link rel="import" href="../../components/chat-register/chat-register.html">
 <link rel="import" href="../../components/chat-room/chat-room.html">
 <link rel="import" href="../../bower/core-pages/core-pages.html">
+<link rel="import" href="../../bower/core-ajax/core-ajax.html">
 <polymer-element name="chat-page">
 	<template>
+	    <core-ajax
+	      url="/status"
+	      method="GET"
+	      handleAs="json"
+	      on-core-response="{{checkLoggedIn}}"
+	      auto
+	    ></core-ajax>
 		<link rel="stylesheet" type="text/css" href="chat-page.css">
 		<core-pages id="pages" valueattr="id" selected="{{page}}">
 		    <chat-login id="login" 
@@ -14,7 +22,7 @@
 		    	on-register="{{registered}}"
 		    	on-back="{{registrationAborted}}"
 		    ></chat-register>
-		    <chat-room id="room"></chat-room>
+		    <chat-room id="room" on-logout="{{loggedOut}}"></chat-room>
 	    </core-pages>
 	</template>
 	<script type="text/javascript" src="chat-page.js"></script>

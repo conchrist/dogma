@@ -1,8 +1,15 @@
 <link rel="import" href="../../../bower/core-drawer-panel/core-drawer-panel.html">
+<link rel="import" href="../../../bower/core-ajax/core-ajax.html">
 <link rel="import" href="../chat-footer/chat-footer.html">
 <polymer-element name="chat-room" attributes="userid username">
 	<template>
 		<link rel="stylesheet" href="chat-room.css">
+		<core-ajax
+			id="logoutajax"
+			handleAs="json"
+			url="/logout"
+			method="POST"
+		></core-ajax>
 		<core-drawer-panel id="drawerpanel" class="right-drawer">
 			<aside drawer class="contacts">
 				<h3>Contacts</h3>
@@ -15,6 +22,7 @@
 		    <div main>
 			    <div class="jumbotron">
 			    	<button class="contactbutton" on-click="{{toggleDrawer}}">Contacts</button>
+			    	<button class="contactbutton" on-click="{{logout}}">Log out</button>
 		  			<h1>Chat room</h1>
 		  		</div>
 			  	<article>

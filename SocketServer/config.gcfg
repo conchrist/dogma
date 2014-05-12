@@ -2,7 +2,7 @@
 ; Don't forget to change the port in bower_components/chat-room/chat-room.js
 [Server]
 bind = 0.0.0.0 #Default is 127.0.0.1
-port = 4000 #Port to use.
+port = 5000 #Port to use.
 [DB]
 address = localhost #Default is localhost
 name = Dogma #Default is Dogma
