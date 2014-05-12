@@ -9,32 +9,32 @@ import (
 
 type server struct {
 	mutex        *sync.Mutex
-	clients      map[*Client]bool
-	addClient    chan *Client
-	removeClient chan *Client
+	clients      map[*client]bool
+	addClient    chan *client
+	removeClient chan *client
 	sendAll      chan *messageStruct
-	messages     []*messageStruct
+	_messages    []*messageStruct
 }
 
 func NewServer(address, name string) *server {
 	server := &server{
 		mutex:        &sync.Mutex{},
-		clients:      make(map[*Client]bool),
-		addClient:    make(chan *Client),
-		removeClient: make(chan *Client),
+		clients:      make(map[*client]bool),
+		addClient:    make(chan *client),
+		removeClient: make(chan *client),
 		sendAll:      make(chan *messageStruct),
-		messages:     make([]*messageStruct, 0),
+		_messages:    make([]*messageStruct, 0),
 	}
 	return server
 }
 
 //channel to add a client to the chat.
-func (s *server) AddClient() chan<- *Client {
+func (s *server) AddClient() chan<- *client {
 	return (s.addClient)
 }
 
 //channel to remove a client from the chat.
-func (s *server) RemoveClient() chan<- *Client {
+func (s *server) RemoveClient() chan<- *client {
 	return (s.removeClient)
 }
 
@@ -44,14 +44,14 @@ func (s *server) BroadCast() chan<- *messageStruct {
 }
 
 //holds all the messages from clients.
-func (s *server) Messages() []*messageStruct {
-	msgs := make([]*messageStruct, len(s.messages))
-	copy(msgs, s.messages)
+func (s *server) messages() []*messageStruct {
+	msgs := make([]*messageStruct, len(s._messages))
+	copy(msgs, s._messages)
 	return msgs
 }
 
 //return the contact list. (A list of users)
-func (s *server) GetContacts() map[*Client]bool {
+func (s *server) getContacts() map[*client]bool {
 	return s.clients
 }
 
@@ -79,7 +79,7 @@ func (s *server) Listen() {
 			s.mutex.Unlock()
 
 			//write all previous messages to this client
-			for _, msg := range s.messages {
+			for _, msg := range s._messages {
 				newclient.write() <- msg
 			}
 
@@ -92,7 +92,7 @@ func (s *server) Listen() {
 
 		//new message came in, distribute to all clients.
 		case message := <-s.sendAll:
-			s.messages = append(s.messages, message)
+			s._messages = append(s._messages, message)
 			for client, _ := range s.clients {
 				client.write() <- message
 			}
