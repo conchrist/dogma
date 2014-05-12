@@ -115,6 +115,21 @@ func StartServer() {
 		return ""
 	})
 
+	m.Get("/status", func(s sessions.Session, r render.Render) {
+		userid := s.Get("UserID")
+		if userid, ok := userid.(string); ok {
+			r.JSON(200, map[string]interface{}{
+				"status":   "logged in",
+				"loggedIn": true,
+			})
+		} else {
+			r.JSON(401, map[string]interface{}{
+				"status":   "logged out",
+				"loggedIn": false,
+			})
+		}
+	})
+
 	m.Post("/users", binding.Form(User{}), func(user User, r render.Render, db *mgo.Database, s sessions.Session) {
 		if len(user.Username) > 0 && len(user.Password) > 0 {
 			passwordHash, err := hashPass(user.Password)
