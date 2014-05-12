@@ -72,7 +72,7 @@ func (s *server) Listen() {
 		select {
 		//new client connecting
 		case newclient := <-s.addClient:
-			ip := newclient.IP()
+			ip := newclient.iP()
 			log.Println("New client with ip " + ip + " added")
 			s.mutex.Lock()
 			s.clients[newclient] = true
@@ -80,7 +80,7 @@ func (s *server) Listen() {
 
 			//write all previous messages to this client
 			for _, msg := range s.messages {
-				newclient.Write() <- msg
+				newclient.write() <- msg
 			}
 
 		//client disconnected.
@@ -88,13 +88,13 @@ func (s *server) Listen() {
 			s.mutex.Lock()
 			delete(s.clients, removeClient)
 			s.mutex.Unlock()
-			log.Println("Client with ip " + removeClient.IP() + " disconnected")
+			log.Println("Client with ip " + removeClient.iP() + " disconnected")
 
 		//new message came in, distribute to all clients.
 		case message := <-s.sendAll:
 			s.messages = append(s.messages, message)
 			for client, _ := range s.clients {
-				client.Write() <- message
+				client.write() <- message
 			}
 		}
 	}

@@ -68,7 +68,7 @@ func (c *Client) conn() *websocket.Conn {
 }
 
 func (c *Client) iP() string {
-	return c.Conn().Request().RemoteAddr
+	return c.conn().Request().RemoteAddr
 }
 
 //get write channel.
@@ -112,7 +112,7 @@ func (c *Client) ListenToAll() {
 		//what message is coming?
 		switch message.Type {
 		case "message":
-			log.Println("Incoming message: " + message.Message + " from ip " + c.IP())
+			log.Println("Incoming message: " + message.Message + " from ip " + c.iP())
 			go c.insertMessage(&message)
 			c.server.BroadCast() <- &message
 			break
@@ -138,7 +138,7 @@ func (c *Client) ListenToAll() {
 		//client requested a username
 		// END OMIT
 		case "user":
-			ip := c.IP()
+			ip := c.iP()
 			userMessage := &messageStruct{
 				From:    ip,
 				Message: ip,
@@ -146,7 +146,7 @@ func (c *Client) ListenToAll() {
 				Time:    message.Time,
 			}
 			//send to yourself!
-			c.Write() <- userMessage
+			c.write() <- userMessage
 			break
 		}
 	}
