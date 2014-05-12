@@ -7,7 +7,7 @@ import (
 )
 
 //specify how a message looks like.
-type MessageStruct struct {
+type messageStruct struct {
 	From    string `json:"from"`
 	Message string `json:"body"`
 	Type    string `json:"type"`
@@ -15,7 +15,7 @@ type MessageStruct struct {
 }
 
 //specify how the contact list looks like.
-type ContactMessage struct {
+type contactMessage struct {
 	Contacts []string `json:"contacts"`
 	Type     string   `json:"type"`
 }

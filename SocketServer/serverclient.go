@@ -20,15 +20,15 @@ const channelSize = 1000
 //holds all the info an client needs.
 type Client struct {
 	ws       *websocket.Conn
-	server   *Server
-	send     chan *MessageStruct
+	server   *server
+	send     chan *messageStruct
 	done     chan bool
 	username string
 	userid   string
 	db       *mgo.Database
 }
 
-func NewClient(ws *websocket.Conn, server *Server, username, userid string, db *mgo.Database) *Client {
+func NewClient(ws *websocket.Conn, server *server, username, userid string, db *mgo.Database) *Client {
 
 	if ws == nil {
 		log.Fatal(WEBSOCKETERROR.Error())
@@ -37,7 +37,7 @@ func NewClient(ws *websocket.Conn, server *Server, username, userid string, db *
 	}
 
 	//channel to send messages over.
-	send := make(chan *MessageStruct, channelSize)
+	send := make(chan *messageStruct, channelSize)
 
 	//channel to prompt the server when done.
 	done := make(chan bool)
@@ -55,7 +55,7 @@ func NewClient(ws *websocket.Conn, server *Server, username, userid string, db *
 }
 
 //insert messages into DB.
-func (c *Client) insertMessage(message *MessageStruct) {
+func (c *Client) insertMessage(message *messageStruct) {
 	err := c.db.C("Messages").Insert(message)
 	if err != nil {
 		log.Fatalf("%s %s", DBINSERT.Error(), err.Error())
@@ -63,19 +63,20 @@ func (c *Client) insertMessage(message *MessageStruct) {
 }
 
 //getter for client connection
-func (c *Client) Conn() *websocket.Conn {
+func (c *Client) conn() *websocket.Conn {
 	return c.ws
 }
 
-func (c *Client) IP() string {
+func (c *Client) iP() string {
 	return c.Conn().Request().RemoteAddr
 }
 
 //get write channel.
-func (c *Client) Write() chan<- *MessageStruct {
+func (c *Client) write() chan<- *messageStruct {
 	return c.send
 }
 
+//start client and listen on connections.
 func (c *Client) Listen() {
 	go c.sendLoop()
 	c.ListenToAll()
@@ -102,7 +103,7 @@ func (c *Client) sendLoop() {
 
 func (c *Client) ListenToAll() {
 	for {
-		var message MessageStruct
+		var message messageStruct
 		err := websocket.JSON.Receive(c.ws, &message)
 		if err != nil {
 			c.done <- true
@@ -128,7 +129,7 @@ func (c *Client) ListenToAll() {
 			}
 			c.server.mutex.Unlock()
 			//struct containing all contacts.
-			contactsMessage := &ContactMessage{
+			contactsMessage := &contactMessage{
 				Contacts: usernames,
 				Type:     "contacts",
 			}
@@ -138,7 +139,7 @@ func (c *Client) ListenToAll() {
 		// END OMIT
 		case "user":
 			ip := c.IP()
-			userMessage := &MessageStruct{
+			userMessage := &messageStruct{
 				From:    ip,
 				Message: ip,
 				Type:    "user",
