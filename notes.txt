@@ -1,7 +1,0 @@
-Notes:
-
-Explain the code in register.
-
-Put regex in chat-register.html
-
-Fix chat when registering new user.
