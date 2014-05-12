@@ -30,17 +30,17 @@ func NewServer(address, name string) *server {
 
 //channel to add a client to the chat.
 func (s *server) AddClient() chan<- *client {
-	return (s.addClient)
+	return s.addClient
 }
 
 //channel to remove a client from the chat.
 func (s *server) RemoveClient() chan<- *client {
-	return (s.removeClient)
+	return s.removeClient
 }
 
 //channel to broadcast the messages to all clients.
 func (s *server) BroadCast() chan<- *messageStruct {
-	return (s.sendAll)
+	return s.sendAll
 }
 
 //holds all the messages from clients.
@@ -81,6 +81,12 @@ func (s *server) Listen() {
 			//write all previous messages to this client
 			for _, msg := range s._messages {
 				newclient.write() <- msg
+			}
+
+			s.BroadCast() <- &messageStruct{
+				From:    "server",
+				Message: newclient.username,
+				Type:    "client joined",
 			}
 
 		//client disconnected.
