@@ -1,6 +1,7 @@
 <link rel="import" href="../../../bower/core-drawer-panel/core-drawer-panel.html">
 <link rel="import" href="../../../bower/core-ajax/core-ajax.html">
 <link rel="import" href="../chat-footer/chat-footer.html">
+<link rel="import" href="../../../bower/core-icon/core-icon.html">
 <polymer-element name="chat-room" attributes="userid username">
 	<template>
 		<link rel="stylesheet" href="chat-room.css">
@@ -12,6 +13,7 @@
 		></core-ajax>
 		<core-drawer-panel id="drawerpanel" class="right-drawer">
 			<aside drawer class="contacts">
+				<button on-click="{{logout}}">Log out<core-icon icon="close"></core-icon></button>
 				<h3>Contacts</h3>
 		    	<ul>
 		    		<template repeat="{{contact in contacts}}">
@@ -21,14 +23,13 @@
 		    </aside>
 		    <div main>
 			    <div class="jumbotron">
-			    	<button class="contactbutton" on-click="{{toggleDrawer}}">Contacts</button>
-			    	<button class="contactbutton" on-click="{{logout}}">Log out</button>
+			    	<button class="drawerbutton" on-click="{{toggleDrawer}}"><core-icon icon="drawer"></core-icon></button>
 		  			<h1>Chat room</h1>
 		  		</div>
 			  	<article>
 				  	<form id="sendForm" on-submit="{{formSubmit}}">
-				        <input type="text" id="textField" autocomplete="off"/>
-				        <input type="button" id="sendButton" class="btn btn-success" Value="Send"/>
+				        <input type="text" id="textField" autocomplete="off" required/>
+				        <input type="submit" id="sendButton" class="btn btn-success" Value="Send"/>
 				    </form>
 				    <ul id="messages">
 				    	<template repeat="{{message in messages}}">
