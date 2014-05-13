@@ -97,6 +97,13 @@ func (s *server) Listen() {
 			delete(s.clients, removeClient)
 			s.mutex.Unlock()
 			log.Println("Client with ip " + removeClient.iP() + " disconnected")
+			go func() {
+				s.BroadCast() <- &messageStruct{
+					From:    "server",
+					Message: removeClient.username,
+					Type:    "client left",
+				}
+			}()
 
 		//new message came in, distribute to all clients.
 		case message := <-s.sendAll:
