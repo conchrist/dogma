@@ -3,6 +3,7 @@ package SocketServer
 import (
 	"code.google.com/p/go.net/websocket"
 	"labix.org/v2/mgo"
+	"labix.org/v2/mgo/bson"
 	"log"
 	"sync"
 )
@@ -57,6 +58,16 @@ func (s *server) getContacts() map[*client]bool {
 
 //a handler to handle a new client connection.
 func (s *server) onConnectHandler(username, userid string, db *mgo.Database) websocket.Handler {
+	messages := make([]*messageStruct, 0)
+	err := db.C("Messages").Find(bson.M{}).All(&messages)
+	if err != nil {
+		log.Fatalf("%s %s", DBERROR.Error(), err.Error())
+	}
+
+	s._messages = append(s._messages, messages...)
+
+	log.Println(s._messages)
+
 	return websocket.Handler(func(ws *websocket.Conn) {
 		defer ws.Close()
 		client := NewClient(ws, s, username, userid, db)
