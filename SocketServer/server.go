@@ -18,13 +18,23 @@ type server struct {
 }
 
 func NewServer(address, name string) *server {
+	session, err := mgo.Dial(address)
+	defer session.Close()
+
+	messages := make([]*messageStruct, 0)
+
+	err = session.DB(name).C("Messages").Find(bson.M{}).All(&messages)
+	if err != nil {
+		log.Fatalf("%s %s", DBERROR.Error(), err.Error())
+	}
+
 	server := &server{
 		mutex:        &sync.Mutex{},
 		clients:      make(map[*client]bool),
 		addClient:    make(chan *client),
 		removeClient: make(chan *client),
 		sendAll:      make(chan *messageStruct),
-		_messages:    make([]*messageStruct, 0),
+		_messages:    messages,
 	}
 	return server
 }
@@ -58,16 +68,6 @@ func (s *server) getContacts() map[*client]bool {
 
 //a handler to handle a new client connection.
 func (s *server) onConnectHandler(username, userid string, db *mgo.Database) websocket.Handler {
-	messages := make([]*messageStruct, 0)
-	err := db.C("Messages").Find(bson.M{}).All(&messages)
-	if err != nil {
-		log.Fatalf("%s %s", DBERROR.Error(), err.Error())
-	}
-
-	s._messages = append(s._messages, messages...)
-
-	log.Println(s._messages)
-
 	return websocket.Handler(func(ws *websocket.Conn) {
 		defer ws.Close()
 		client := NewClient(ws, s, username, userid, db)
