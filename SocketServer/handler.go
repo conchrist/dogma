@@ -202,7 +202,7 @@ func StartServer() {
 
 	bindAddress = ":" + port
 	log.Fatal(http.ListenAndServeTLS(bindAddress,
-		"Socketserver/ssl/server.crt",
-		"Socketserver/ssl/server.key",
+		"SocketServer/ssl/server.crt",
+		"SocketServer/ssl/server.key",
 		m))
 }

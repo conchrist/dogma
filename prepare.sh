@@ -1,6 +1,7 @@
 #!/bin/bash
 
-echo "Downloading dependencies"
+printf "\e[95m\e[5mDogma\e[25m\e[39m\n"
+printf "\e[97m\e[4m\e[101mDownloading dependencies\e[49m\e[39m\n"
 
 npm install -g bower
 bower install
