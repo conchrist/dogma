@@ -24,7 +24,7 @@ type contactMessage struct {
 func mongoDB(adress, db string) martini.Handler {
 	session, err := mgo.Dial(adress)
 	if err != nil {
-		log.Fatal("Could not connect to database " + err.Error())
+		log.Fatalf("%s %s", DBERROR.Error(), err.Error())
 	}
 	return func(c martini.Context) {
 		s := session.Clone()
