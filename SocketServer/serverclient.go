@@ -3,6 +3,7 @@ package SocketServer
 import (
 	"code.google.com/p/go.net/websocket"
 	"errors"
+	"github.com/wsxiaoys/terminal/color"
 	"labix.org/v2/mgo"
 	"log"
 )
@@ -112,11 +113,15 @@ func (c *client) listenToAll() {
 		//what message is coming?
 		switch message.Type {
 		case "message":
-			log.Println("Incoming message: " + message.Message + " from ip " + c.iP())
+			color.Printf("@{mK}Incoming message: %s from ip %s\n", message.Message, c.iP())
 			go c.insertMessage(&message)
 			c.server.BroadCast() <- &message
 			break
 		// START OMIT
+		case "image":
+			log.Println("Image received from client " + message.From + "from ip " + c.iP())
+			c.server.BroadCast() <- &message
+			go c.insertMessage(&message)
 		case "contact_list":
 			contacts := c.server.getContacts()
 

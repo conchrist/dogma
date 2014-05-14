@@ -7,6 +7,7 @@ import (
 	"github.com/codegangsta/martini-contrib/render"
 	"github.com/codegangsta/martini-contrib/sessions"
 	"github.com/russross/blackfriday"
+	"github.com/wsxiaoys/terminal/color"
 	"io"
 	"io/ioutil"
 	"labix.org/v2/mgo"
@@ -18,8 +19,10 @@ import (
 //Struct to hold all the configurations.
 type Config struct {
 	Server struct {
-		Port string
-		Bind string
+		Port           string
+		Bind           string
+		SSLCertificate string
+		SSLKey         string
 	}
 	DB struct {
 		Address string
@@ -27,8 +30,15 @@ type Config struct {
 	}
 }
 
-func StartServer() {
+func StartServer(configPath string) {
+	m, bindAddress, sslCert, sslKey := App(configPath)
+	log.Fatal(http.ListenAndServeTLS(bindAddress,
+		sslCert,
+		sslKey,
+		m))
+}
 
+func App(configPath string) (*martini.ClassicMartini, string, string, string) {
 	//---------------------------------------------------------------
 	//Config area
 	config := new(Config)
@@ -37,7 +47,7 @@ func StartServer() {
 	var dbaddress string
 	var dbname string
 
-	err := gcfg.ReadFileInto(config, "SocketServer/config.gcfg")
+	err := gcfg.ReadFileInto(config, configPath)
 
 	if err != nil {
 		log.Fatal("Could not read and parse config file")
@@ -69,7 +79,10 @@ func StartServer() {
 	//---------------------------------------------------------------
 
 	m := martini.Classic()
-	log.Println("New server started on port " + port)
+	m.Use(martini.Logger())
+	m.Use(martini.Recovery())
+
+	color.Println("@{g}New server started on port " + port)
 	//create new cookie store
 	store := sessions.NewCookieStore([]byte("mySuperSecretPassword1234"))
 	m.Use(martini.Static("bower_components", martini.StaticOptions{
@@ -118,7 +131,6 @@ func StartServer() {
 	m.Get("/status", func(s sessions.Session, r render.Render) {
 		userid := s.Get("UserID")
 		username := s.Get("Username")
-		log.Println("SESSION USER", userid, username)
 		if _, ok := userid.(string); ok {
 			r.JSON(200, map[string]interface{}{
 				"status":   "logged in",
@@ -201,8 +213,7 @@ func StartServer() {
 	//---------------------------------------------------------------
 
 	bindAddress = ":" + port
-	log.Fatal(http.ListenAndServeTLS(bindAddress,
-		"SocketServer/ssl/server.crt",
-		"SocketServer/ssl/server.key",
-		m))
+	sslCert := config.Server.SSLCertificate
+	sslKey := config.Server.SSLKey
+	return m, bindAddress, sslCert, sslKey
 }

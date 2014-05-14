@@ -26,6 +26,7 @@ func NewServer(address, name string) *server {
 	err = session.DB(name).C("Messages").Find(bson.M{}).All(&messages)
 	if err != nil {
 		log.Fatalf("%s %s", DBERROR.Error(), err.Error())
+		return nil
 	}
 
 	server := &server{
