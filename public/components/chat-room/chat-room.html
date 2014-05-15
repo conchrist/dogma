@@ -27,12 +27,12 @@
 		    </aside>
 		    <div main>
 			    <div class="jumbotron">
-			    	<button class="drawerbutton" on-click="{{toggleDrawer}}"><core-icon icon="drawer"></core-icon></button>
+			    	<button class="drawerbutton" on-click="{{toggleDrawer}}"><core-icon icon="menu"></core-icon></button>
 		  			<h1>Chat room</h1>
 		  		</div>
 			  	<article>
 				  	<form id="sendForm" on-submit="{{formSubmit}}">
-				  	<core-icon-button icon="plus" on-click="{{plusbutton}}"></core-icon-button>
+				  	<core-icon-button icon="add-box" on-click="{{plusbutton}}"></core-icon-button>
 				        <input type="text" id="textField" autocomplete="off" required/>
 				        <input type="submit" id="sendButton" class="btn btn-success" Value="Send"/>
 				    </form>
