@@ -13,17 +13,24 @@
 	      auto
 	    ></core-ajax>
 		<link rel="stylesheet" type="text/css" href="chat-page.css">
+		//START OMIT
 		<core-pages id="pages" valueattr="id" selected="{{page}}">
-		    <chat-login id="login" 
+		    <chat-login 
+		    	id="login" 
 		    	on-new-user="{{register}}" 
 		    	on-login="{{handleLogin}}"
 		    ></chat-login>
-		    <chat-register id="register" 
+		    <chat-register
+		    	id="register" 
 		    	on-register="{{registered}}"
 		    	on-back="{{registrationAborted}}"
 		    ></chat-register>
-		    <chat-room id="room" on-logout="{{loggedOut}}"></chat-room>
+		    <chat-room 
+		    	id="room" 
+		    	on-logout="{{loggedOut}}"
+		    ></chat-room>
 	    </core-pages>
+	    //END OMIT
 	</template>
 	<script type="text/javascript" src="chat-page.js"></script>
 </polymer-element>
