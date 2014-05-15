@@ -96,17 +96,20 @@ Klienten kopplar upp sig mot servern med WebSockets och skickar meddelanden som 
 * Tekniska frågor
 
 -   Q: Hur implementerar vi en lista över alla inloggade användare?
-	A: Se kodimplementation som vi visat tidigare. Clienten måste dock skicka
-	en speciellt JSON-meddelande för att få del av listan.
+	A: Se kodimplementation som vi visat tidigare. Listan visas längst till höger om
+	det finns tillräckligt med plats och som en dold gardinpanel på midre skärmar.
 
--   Q: Fråga Foo
-	A: Bar
+-   Q: Hur hanterar vi om en användare stänger av sin webbläsare och återöppnar chatprogrammet?
+	A: En session kommer att vara sparad och användaren förblir inloggad nästa gång
+	denne öppnar chatten.
 
--   Q: Fråga Foo
-	A: Bar
+-   Q: Hur löser vi test av programmet?
+	A: De flesta tester är skrivna som integrationstester som skapar en testversion av servern
+	med hjälp av paketet net/http/httptest. Själva testfallen är skrivna med GoConvey och hanterar
+	både http och websocket. Vi har även utfört några ytterst informella användartester.
 
--   Q: Fråga Foo
-	A: Bar
+-   Q: Hur pass awesome är Go?
+	A: Mycket awesome.
 
 * Smakprov
 
