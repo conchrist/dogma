@@ -16,7 +16,7 @@ The gopher images are Creative Commons Attributions 3.0 licensed and they are cr
 * Programbeskrivning
 
 - Krav:
-	Databas: MongoDB
+	Databas: MongoDB, Go 1.2+, Webbläsare med stöd för WebSocket
 
 Programmet är tänkt att utgöra ett komplett internt chattsystem för ett företag.
 
@@ -37,29 +37,29 @@ Vi har inte utgått från en speciell typ av målgrupp, men programvaran är vä
 En person på företaget är nyanställd och har fått i uppgift av sin chef att bekanta sig med det nya interna kommunikationssystemet.
 Personen möts av följande gränssnitt:
 
-.link https://github.com/conchrist/dogma/blob/master/1.png Huvudmeny
+.link https://github.com/conchrist/dogma/blob/master/presentation/login.png Huvudmeny
 
 För att komma vidare och skapa en ny användare, trycker användaren på knappen med texten "New user" som i sin tur leder till följande vy:
 
-.link https://github.com/conchrist/dogma/blob/master/3.png Ny användare
+.link https://github.com/conchrist/dogma/blob/master/presentation Ny användare
 
 Här skriven användaren in ett valt användarnamn och ett lösenord och trycker på knappen "Create user" för att komma vidare till chattsidan.
-
-.link https://github.com/conchrist/dogma/blob/master/2.png Chatt
 
  ... fortsättning ->
 
 * Användarscenarier
 
+.link https://github.com/conchrist/dogma/blob/master/presentation/chatroom1.png Chatt
+.link https://github.com/conchrist/dogma/blob/master/presentation/online.png Online
+.link https://github.com/conchrist/dogma/blob/master/presentation/media.png Media
+
 Här kan nu användaren skriva meddelanden och kommunicera med alla som för tillfället är inloggade i systemet. För att logga ut stänger man ner fönstret.
 
-.image gopherhat.jpg 400 300
+.image gopherhat.jpg 300 200
 
 * Användarscenarier
 
 - Scenario 2 - Chatt med chefen:
-
-.link https://github.com/conchrist/dogma/blob/master/Presentation/2.png Chatt
 
 En anställd på företaget behöver prata med sin chef som sitter någonstans i det ofantligt stora företagskomplexet. Den anställde har fått sin grundkurs i hur man använder företagets interna kommunikationssystem och vänder sig därför till sin dator. Väl vid datorn skriver den anställde snabbt iväg ett meddelande och trycker "Send". Det dröjer inte länge förrän chefen svarar och ger ett snabbt besked. Allt tack var det nya snabba kommunikationssystemet.
 
