@@ -120,11 +120,11 @@ func (c *client) listenToAll() {
 			c.server.BroadCast() <- &message
 			go c.insertMessage(&message)
 			break
-		// START OMIT
 		case "image":
 			log.Println("Image received from client " + message.From + "from ip " + c.iP())
 			c.server.BroadCast() <- &message
 			go c.insertMessage(&message)
+		// START OMIT
 		case "contact_list":
 			contacts := c.server.getContacts()
 
