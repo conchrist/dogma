@@ -2,6 +2,7 @@ package SocketServer
 
 import (
 	"code.google.com/p/go.net/websocket"
+	"github.com/wsxiaoys/terminal/color"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"log"
@@ -90,7 +91,7 @@ func (s *server) Listen() {
 		//new client connecting
 		case newclient := <-s.addClient:
 			ip := newclient.iP()
-			log.Println("New client with ip " + ip + " added")
+			color.Println("@{g}New client@r with ip @{m}" + ip + "@r added")
 			s.mutex.Lock()
 			s.clients[newclient] = true
 			s.mutex.Unlock()

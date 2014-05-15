@@ -15,6 +15,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
+	"time"
 )
 
 func createHTTPClient() (*http.Client, *cookiejar.Jar, error) {
@@ -103,12 +104,52 @@ func TestWebsocket(t *testing.T) {
 			//defer conn.Close()
 			ws, err := createWSConnection(serverURL, cookie)
 			So(err, ShouldBeNil)
-			websocket.JSON.Send(ws, &messageStruct{
-				From:    "viktor",
-				Message: "Hej",
-				Time:    0,
-				Type:    "message",
+
+			Convey("can receive", func() {
+				var message messageStruct
+				websocket.JSON.Receive(ws, &message)
+				So(message.Type, ShouldEqual, "client joined")
+
+				Convey("can send", func() {
+
+					websocket.JSON.Send(ws, &messageStruct{
+						From:    "viktor",
+						Message: "Hej",
+						Time:    0,
+						Type:    "message",
+					})
+
+					Convey("broadcast back", func() {
+						var message messageStruct
+						websocket.JSON.Receive(ws, &message)
+						So(message.Message, ShouldEqual, "Hej")
+
+						Convey("fails on wrong type", func() {
+							websocket.JSON.Send(ws, &messageStruct{
+								Type: "a",
+							})
+							ch := make(chan messageStruct, 1)
+							go func(chan<- messageStruct) {
+								var message messageStruct
+								websocket.JSON.Receive(ws, &message)
+								ch <- message
+							}(ch)
+							select {
+							case <-time.After(2 * time.Second):
+								So(true, ShouldBeTrue)
+								return
+							case message := <-ch:
+								So(message.Type, ShouldEqual, "message")
+							}
+
+						})
+
+					})
+
+				})
+
 			})
+
 		})
 		Convey("Tear down", func() {
 			//ws.Close()
