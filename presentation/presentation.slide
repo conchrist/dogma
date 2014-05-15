@@ -45,13 +45,13 @@ För att komma vidare och skapa en ny användare, trycker användaren på knappe
 
 Här skriven användaren in ett valt användarnamn och ett lösenord och trycker på knappen "Create user" för att komma vidare till chattsidan.
 
-.link https://github.com/conchrist/dogma/blob/master/presentation/chatroom1.png Chatt
-.link https://github.com/conchrist/dogma/blob/master/presentation/online.png Online
-.link https://github.com/conchrist/dogma/blob/master/presentation/media.png Media
-
  ... fortsättning ->
 
 * Användarscenarier
+
+.link https://github.com/conchrist/dogma/blob/master/presentation/chatroom1.png Chatt
+.link https://github.com/conchrist/dogma/blob/master/presentation/online.png Online
+.link https://github.com/conchrist/dogma/blob/master/presentation/media.png Media
 
 Här kan nu användaren skriva meddelanden och kommunicera med alla som för tillfället är inloggade i systemet. För att logga ut stänger man ner fönstret.
 
