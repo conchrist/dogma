@@ -37,7 +37,7 @@
 				        <input type="submit" id="sendButton" class="btn btn-success" Value="Send"/>
 				    </form>
 				    <ul id="messages">
-				    	<template repeat="{{message in messages}}">
+				    	<template repeat="{{message in reversed}}">
 				    		<template if="{{message.type == 'message'}}">
 					    		<li><span class="username">{{message.from}}</span> {{message.body}}</li>
 				    		</template>

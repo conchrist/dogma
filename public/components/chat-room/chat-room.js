@@ -4,6 +4,7 @@
             userid: null,
             username: null,
             messages: [],
+            reversed: [],
             showAddOverlay: false,
             //START OMIT
             connect: function(host, port, path) {
@@ -38,7 +39,6 @@
                     var data = e.data;
                     var object = JSON.parse(data);
                     if (['message', 'image'].indexOf(object.type) !== -1) {
-                        console.log(object);
                         this.messages.push(object);
                     } else if (object.type === 'contacts') {
                         object.contacts.forEach(function(contact) {
@@ -133,6 +133,12 @@
             addFile: function() {
                 var files = this.$.mediafile.files;
                 this.readImages(files, this.sendImage);
+            },
+            messagesChanged: function() {
+                var array = this.messages;
+                var copy = array.slice();
+                copy.reverse();
+                this.reversed = copy;
             }
       });
 }(this, document));
