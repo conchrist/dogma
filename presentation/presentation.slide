@@ -55,7 +55,7 @@ Här skriven användaren in ett valt användarnamn och ett lösenord och trycker
 
 Här kan nu användaren skriva meddelanden och kommunicera med alla som för tillfället är inloggade i systemet. För att logga ut stänger man ner fönstret.
 
-.image gopherhat.jpg 400 300
+.image gopherhat.jpg 300 200
 
 * Användarscenarier
 
