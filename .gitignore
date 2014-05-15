@@ -31,3 +31,6 @@ SocketServer/ssl
 bower_components
 dogma
 notes.txt
+config.gcfg
+test.gcfg
+

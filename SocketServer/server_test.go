@@ -1,10 +1,13 @@
 package SocketServer
 
+/*
+Test code for dogma chat.
+*/
+
 import (
 	"code.google.com/p/gcfg"
 	"code.google.com/p/go.net/websocket"
 	"crypto/tls"
-	"fmt"
 	. "github.com/smartystreets/goconvey/convey"
 	"labix.org/v2/mgo"
 	"net/http"
@@ -14,73 +17,103 @@ import (
 	"testing"
 )
 
-func createHTTPClient() (*http.Client, *cookiejar.Jar) {
-	j, err := cookiejar.New(nil)
+func createHTTPClient() (*http.Client, *cookiejar.Jar, error) {
+	jar, err := cookiejar.New(nil)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true},
 	}
 
 	client := &http.Client{
-		Jar:       j,
-		Transport: tr,
+		Jar:       jar,
+		Transport: transport,
 	}
-
-	return client, j
+	return client, jar, nil
 }
 
-func login(client *http.Client, serverURL *url.URL, jar *cookiejar.Jar) (*http.Cookie, *http.Response, error) {
-	resp, err := client.PostForm(serverURL.String(), url.Values{"username": {"viktor"}, "password": {"hej"}})
-	cookie := jar.Cookies(serverURL)[0]
+func createUser(client *http.Client, serverURL *url.URL, jar *cookiejar.Jar) (*http.Cookie, *http.Response, error) {
+	values := url.Values{
+		"username": {"viktor"},
+		"password": {"123"},
+	} //the actual values we want to send to the server.
+	resp, err := client.PostForm(serverURL.String(), values)
+	cookie := jar.Cookies(serverURL)[0] //We suppose we only get one cookie from the server.
 	return cookie, resp, err
 }
 
-func createWSConnection(serverURL *url.URL, cookie *http.Cookie) *websocket.Conn {
-	origin := "https://127.0.0.1/"
+func createWSConnection(serverURL *url.URL, cookie *http.Cookie) (*websocket.Conn, error) {
+	origin := "https://127.0.0.1/" //server address
 	socketURL := "wss://" + serverURL.Host + "/chat"
 	socketConfig, _ := websocket.NewConfig(socketURL, origin)
 	socketConfig.TlsConfig = &tls.Config{InsecureSkipVerify: true}
 	socketConfig.Header.Add("Cookie", cookie.String())
 	ws, err := websocket.DialConfig(socketConfig)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	return ws
+	return ws, err
 }
 
 func TestWebsocket(t *testing.T) {
-	var err error
-	config := new(Config)
-	gcfg.ReadFileInto(config, "../test.gcfg")
-	conn, err := mgo.Dial(config.DB.Address)
-	db := conn.DB(config.DB.Name)
-
-	db.C("Users").DropCollection()
-	db.C("Messages").DropCollection()
-
-	app, _, _, _ := App("../test.gcfg")
-	ts := httptest.NewTLSServer(app)
-
-	address := ts.URL + "/users"
-	serverURL, _ := url.Parse(address)
-	client, jar := createHTTPClient()
-	cookie, _, err := login(client, serverURL, jar)
+	var db *mgo.Database
+	var server *httptest.Server
+	var serverURL *url.URL
+	var client *http.Client
+	var jar *cookiejar.Jar
+	var cookie *http.Cookie
 	Convey("Websocket Test", t, func() {
-		Convey("Should be able to login", func() {
-			ShouldBeNil(err)
+		Convey("Should connect to DB", func() {
+			config := new(Config)
+			gcfg.ReadFileInto(config, "../test.gcfg")
 
+			conn, err := mgo.Dial(config.DB.Address)
+			So(err, ShouldBeNil)
+			db = conn.DB(config.DB.Name)
+
+			db.C("Users").DropCollection()
+			db.C("Messages").DropCollection()
 		})
-	})
 
-	defer ts.Close()
-	ws := createWSConnection(serverURL, cookie)
-	websocket.JSON.Send(ws, &messageStruct{
-		From:    "viktor",
-		Message: "Hej",
-		Time:    0,
-		Type:    "message",
+		Convey("Should parse mockup server url", func() {
+			var err error
+			app, _, _, _ := App("../test.gcfg")
+			server = httptest.NewTLSServer(app)
+
+			address := server.URL + "/users"
+			serverURL, err = url.Parse(address)
+			So(err, ShouldBeNil)
+			So(serverURL, ShouldNotBeNil)
+		})
+
+		Convey("Should create client", func() {
+			var err error
+			client, jar, err = createHTTPClient()
+			So(err, ShouldBeNil)
+		})
+
+		Convey("Should be able to create new user", func() {
+			var err error
+			So(serverURL, ShouldNotBeNil)
+			cookie, _, err = createUser(client, serverURL, jar)
+			So(err, ShouldBeNil)
+		})
+
+		Convey("Should be able to create ws", func() {
+			//defer conn.Close()
+			ws, err := createWSConnection(serverURL, cookie)
+			So(err, ShouldBeNil)
+			websocket.JSON.Send(ws, &messageStruct{
+				From:    "viktor",
+				Message: "Hej",
+				Time:    0,
+				Type:    "message",
+			})
+		})
+		Convey("Tear down", func() {
+			//ws.Close()
+			//server.CloseClientConnections()
+			//server.Close()
+		})
 	})
 }
