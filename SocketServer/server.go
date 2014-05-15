@@ -3,6 +3,7 @@ package SocketServer
 import (
 	"code.google.com/p/go.net/websocket"
 	"labix.org/v2/mgo"
+	"labix.org/v2/mgo/bson"
 	"log"
 	"sync"
 )
@@ -17,13 +18,24 @@ type server struct {
 }
 
 func NewServer(address, name string) *server {
+	session, err := mgo.Dial(address)
+	defer session.Close()
+
+	messages := make([]*messageStruct, 0)
+
+	err = session.DB(name).C("Messages").Find(bson.M{}).All(&messages)
+	if err != nil {
+		log.Fatalf("%s %s", DBERROR.Error(), err.Error())
+		return nil
+	}
+
 	server := &server{
 		mutex:        &sync.Mutex{},
 		clients:      make(map[*client]bool),
 		addClient:    make(chan *client),
 		removeClient: make(chan *client),
 		sendAll:      make(chan *messageStruct),
-		_messages:    make([]*messageStruct, 0),
+		_messages:    messages,
 	}
 	return server
 }

@@ -2,6 +2,9 @@
 <link rel="import" href="../../../bower/core-ajax/core-ajax.html">
 <link rel="import" href="../chat-footer/chat-footer.html">
 <link rel="import" href="../../../bower/core-icon/core-icon.html">
+<link rel="import" href="../../../bower/core-icon-button/core-icon-button.html">
+<link rel="import" href="../../../bower/core-overlay/core-overlay.html">
+<link rel="import" href="../../../bower/core-transition/core-transition-css.html">
 <polymer-element name="chat-room" attributes="userid username">
 	<template>
 		<link rel="stylesheet" href="chat-room.css">
@@ -13,8 +16,9 @@
 		></core-ajax>
 		<core-drawer-panel id="drawerpanel" class="right-drawer">
 			<aside drawer class="contacts">
+				<span>Logged in as {{username}}</span> 
 				<button on-click="{{logout}}">Log out<core-icon icon="close"></core-icon></button>
-				<h3>Contacts</h3>
+				<h3>Online</h3>
 		    	<ul>
 		    		<template repeat="{{contact in contacts}}">
 		    			<li>{{contact}}</li>
@@ -28,18 +32,34 @@
 		  		</div>
 			  	<article>
 				  	<form id="sendForm" on-submit="{{formSubmit}}">
+				  	<core-icon-button icon="plus" on-click="{{plusbutton}}"></core-icon-button>
 				        <input type="text" id="textField" autocomplete="off" required/>
 				        <input type="submit" id="sendButton" class="btn btn-success" Value="Send"/>
 				    </form>
 				    <ul id="messages">
 				    	<template repeat="{{message in messages}}">
-				    		<li><span class="username">{{message.from}}</span> {{message.body}}</li>
+				    		<template if="{{message.type == 'message'}}">
+					    		<li><span class="username">{{message.from}}</span> {{message.body}}</li>
+				    		</template>
+				    		<template if="{{message.type == 'image'}}">
+				    		<li><span class="username">{{message.from}}</span><img src="{{message.body}}" class="messageimg"></li>
+				    		</template>
 				    	</template>
 				    </ul>
 			    </article>
 			    <chat-footer></chat-footer>
 		    </div>
 	    </core-drawer-panel>
+	<core-overlay 
+		backdrop 
+		opened="{{showAddOverlay}}"
+		transition="core-transition-center"
+		class="dialog"
+	>
+		<h2>Add media</h2>
+		<input type="file" id="mediafile">
+		<button core-overlay-toggle on-click="{{addFile}}">Add</button>
+	</core-overlay>
 	</template>
 	<script type="text/javascript" src="chat-room.js"></script>
 </polymer-element>

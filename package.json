@@ -1,0 +1,9 @@
+{
+  "name": "dogma",
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "ws": "~0.4.31"
+  }
+}
