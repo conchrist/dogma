@@ -68,7 +68,7 @@ En anställd på företaget behöver prata med sin chef som sitter någonstans i
 Vi behöver lägga ner mer tid på testning och utformandet av gränssnittet. Det finns buggar som vi är mycker väl medvetna om och som vi kommer ha färdiga innan deadline. Det är framförallt storleken och användarupplevelsen i varje vy som vi kommer lägga fokus på, men även att lägga till lite nya features. Som ni såg i ovan presentation av scenarion så har vi kommit långt i själva utvecklandet av det visuella, men det finns alltid små detaljer som man kan rätta till.
 Vi kommer att försöka få människor i vår omgivning att ge feedback angående vår design vilket kommer utveckla vår programvara till det bättre.
 
-.image project.png 300 350
+.image gophers.jpg 300 400
 
 * Programdesign
 Inloggnings-proceduren
@@ -76,16 +76,14 @@ Inloggnings-proceduren
 .code ../SocketServer/handler.go /START OMIT/,/END OMIT/
 
 * Programdesign
-Användarna ska kunna se vilka användare som för närvarande är online.
-
-Denna lista visas ännu inte i det grafiska interfacet.
+Programmet visar vilka användare som för tillfället är inloggade.
 
 .code ../SocketServer/serverclient.go /START OMIT/,/END OMIT/
 
 * Programdesign
 Front-end koden är modulariserad med Web Components och Polymer.
 
-.code ../public/components/chat-room/chat-room.html
+.code ../public/components/chat-page/chat-page.html  /\<core-pages/,/\<\/core-pages/
 
 * Programdesign
 Klienten kopplar upp sig mot servern med WebSockets och skickar meddelanden som JSON.
@@ -115,14 +113,23 @@ Klienten kopplar upp sig mot servern med WebSockets och skickar meddelanden som 
 
 Låt oss visa detta i produktion. Be till demo-gudarna!
 
-.play ../dogma.go
+.play ../dogma.go /START OMIT/,/END OMIT/
 
-.link https://considerate.com:4000 klient
+.link https://unicorn.considerate.se:4443 klient
 
-.image frontpage.png 140 140
+.image frontpage.png 
 
 * Sammanfattning
-TODO.
+Projektet var till stor del klart innan den schemalagda tiden. Vi har dock arbetat med att förfina
+många delar av projektet den senare tiden.Det har gått förhållandevis bra och det var ett intressant projekt att arbeta med. 
 
-* Programvaror
+Just detta projekt är inte så troligt att vi kommer jobba vidare med i framtiden det var däremot lärorikt och vi har kunnat ta till oss av kunskap om många olika delar i att skriva ett program i projektstruktur som denna. Dessa lärdomar tar vi gärna med oss till framtida projekt.
 
+Vi har hållt oss ganska mycket till den (informella) plan vi skapade vid projektets början och lite har ändrats sedan dess.
+
+* Nämnvärda Programvaror
+- github.com/codegangsta/martini
+- code.google.com/p/gcfg
+- labix.org/v2/mgo
+- polymer-project.org
+- github.com/smartystreets/goconvey/convey
