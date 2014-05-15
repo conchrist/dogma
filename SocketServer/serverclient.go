@@ -116,7 +116,8 @@ func (c *client) listenToAll() {
 		//what message is coming?
 		switch message.Type {
 		case "message":
-			color.Printf("@{mK}Incoming message: %s from ip %s\n", message.Message, c.iP())
+			color.Printf("@{mK}Incoming message: %s from ip %s", message.Message, c.iP())
+			color.Println()
 			c.server.BroadCast() <- &message
 			go c.insertMessage(&message)
 			break
