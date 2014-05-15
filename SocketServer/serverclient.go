@@ -27,6 +27,7 @@ type client struct {
 	username string
 	userid   string
 	db       *mgo.Database
+	running  bool
 }
 
 func NewClient(ws *websocket.Conn, server *server, username, userid string, db *mgo.Database) *client {
@@ -52,6 +53,7 @@ func NewClient(ws *websocket.Conn, server *server, username, userid string, db *
 		username: username,
 		userid:   userid,
 		db:       db,
+		running:  false,
 	}
 }
 
@@ -79,6 +81,7 @@ func (c *client) write() chan<- *messageStruct {
 
 //start client and listen on connections.
 func (c *client) Listen() {
+	c.running = true
 	go c.sendLoop()
 	c.listenToAll()
 }
@@ -89,7 +92,7 @@ func (c *client) done() chan<- bool {
 }
 
 func (c *client) sendLoop() {
-	for {
+	for c.running {
 		select {
 		case message := <-c.send:
 			websocket.JSON.Send(c.ws, message)
@@ -103,7 +106,7 @@ func (c *client) sendLoop() {
 }
 
 func (c *client) listenToAll() {
-	for {
+	for c.running {
 		var message messageStruct
 		err := websocket.JSON.Receive(c.ws, &message)
 		if err != nil {
@@ -114,8 +117,8 @@ func (c *client) listenToAll() {
 		switch message.Type {
 		case "message":
 			color.Printf("@{mK}Incoming message: %s from ip %s\n", message.Message, c.iP())
-			go c.insertMessage(&message)
 			c.server.BroadCast() <- &message
+			go c.insertMessage(&message)
 			break
 		// START OMIT
 		case "image":
@@ -155,4 +158,8 @@ func (c *client) listenToAll() {
 			break
 		}
 	}
+}
+
+func (c *client) Close() {
+	c.running = false
 }

@@ -8,6 +8,8 @@ import (
 	"sync"
 )
 
+var running = true
+
 type server struct {
 	mutex        *sync.Mutex
 	clients      map[*client]bool
@@ -15,6 +17,7 @@ type server struct {
 	removeClient chan *client
 	sendAll      chan *messageStruct
 	_messages    []*messageStruct
+	running      bool
 }
 
 func NewServer(address, name string) *server {
@@ -36,6 +39,7 @@ func NewServer(address, name string) *server {
 		removeClient: make(chan *client),
 		sendAll:      make(chan *messageStruct),
 		_messages:    messages,
+		running:      false,
 	}
 	return server
 }
@@ -79,8 +83,9 @@ func (s *server) onConnectHandler(username, userid string, db *mgo.Database) web
 
 //start server!
 func (s *server) Listen() {
+	s.running = true
 	//listen for messages, clients and so on...
-	for {
+	for s.running {
 		select {
 		//new client connecting
 		case newclient := <-s.addClient:
@@ -124,5 +129,12 @@ func (s *server) Listen() {
 				client.write() <- message
 			}
 		}
+	}
+}
+
+func (s *server) Close() {
+	s.running = false
+	for client, _ := range s.clients {
+		client.Close()
 	}
 }

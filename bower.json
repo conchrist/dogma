@@ -21,6 +21,8 @@
     "polymer": "Polymer/polymer#~0.2.4",
     "core-elements": "Polymer/core-elements#~0.2.4",
     "platform": "Polymer/platform#~0.2.4"
+<<<<<<< HEAD
+=======
   },
   "resolutions": {
     "platform": "~0.2.4",
@@ -86,5 +88,6 @@
     "polymer-ui-action-icons": "0.2.4",
     "polymer-ui-iconset": "0.2.4",
     "core-iconset": "0.2.4"
+>>>>>>> 0b66ac4f96fc98eb997439b64a514b99be53614b
   }
 }
